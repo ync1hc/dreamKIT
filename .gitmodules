@@ -1,0 +1,3 @@
+[submodule "app/xip_dk_manager/src/socket.io-client-cpp"]
+	path = app/xip_dk_manager/src/socket.io-client-cpp
+	url = https://github.com/socketio/socket.io-client-cpp.git
