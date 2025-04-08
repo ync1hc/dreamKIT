@@ -1,3 +1,10 @@
 [submodule "app/xip_dk_manager/src/socket.io-client-cpp"]
 	path = app/xip_dk_manager/src/socket.io-client-cpp
 	url = https://github.com/socketio/socket.io-client-cpp.git
+[submodule "app/xip_dk_vssgeneration/vehicle-model-generator"]
+	path = app/xip_dk_vssgeneration/vehicle-model-generator
+	url = https://github.com/eclipse-velocitas/vehicle-model-generator.git
+[submodule "app/xip_dk_vssgeneration/vehicle_signal_specification"]
+	path = app/xip_dk_vssgeneration/vehicle_signal_specification
+	url = https://github.com/COVESA/vehicle_signal_specification.git
+	branch = release/4.0
