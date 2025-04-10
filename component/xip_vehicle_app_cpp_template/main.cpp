@@ -20,13 +20,13 @@ int main(int argc, char **argv) {
   if (config.debug) {
     std::cout << "Debug mode enabled." << std::endl;
   }
+  client.GetServerInfo();
 
   // Sample usage: get, set and get server info.
   client.GetValue("Vehicle.Speed");
   client.SetValue("Vehicle.Speed", 88.5f);
-//   client.SetValue("Vehicle.Status", std::string("Active"));
-//   client.SetValue("Vehicle.Enabled", true);
-  client.GetServerInfo();
+  // client.SetValue("Vehicle.Status", std::string("Active"));
+  // client.SetValue("Vehicle.Enabled", true);
 
   // If there are signal paths, start subscriptions using the SubscriptionManager.
   if (!config.signalPaths.empty()) {
