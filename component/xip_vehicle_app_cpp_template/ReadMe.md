@@ -15,6 +15,10 @@ sudo systemctl restart NetworkManager
 netstat -tuln | grep 55555
 or
 lsof -i :55555
+
+# Fix error at sh files
+sed -i -e 's/\r$//' *.sh
+chmod +x *.sh
 ```
 
 ```shell
@@ -36,7 +40,7 @@ pass: dev12345
 # One time required
 docker network create kuksa
 # Execute the kuksa-databroker (v0.4.4)
-docker run -it --rm --name Server --network kuksa ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4 --insecure
+docker run -dit --rm --name Server --network kuksa ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4 --insecure
 
 ```
 
@@ -49,7 +53,20 @@ docker run -it --rm --name Server --network kuksa ghcr.io/eclipse-kuksa/kuksa-da
 docker build -t kuksa-databroker-client .
 
 # Execute
-docker run --rm --network kuksa kuksa-databroker-client
+docker run --rm --network kuksa kuksa-databroker-client:amd64
+# Debug
+docker run -it --entrypoint /bin/bash --network kuksa kuksa-databroker-client
+```
+
+```shell
+docker buildx build --platform linux/arm64 -t kuksa-databroker-client:arm64 --load .
+docker buildx build --platform linux/arm64/v8 -t kuksa-databroker-client:amd64_x8 --load .
+docker buildx build --platform linux/amd64 -t kuksa-databroker-client:amd64 --load .
+
+# docker cp <containerId>:/path/to/file/in/container /path/to/destination/on/host
+docker cp kuksa-databroker-client:arm64://usr/local/bin/libKuksaClient.so $pwd/lib/arm64
+docker cp kuksa-databroker-client:amd64_x8://usr/local/bin/libKuksaClient.so $pwd/lib/amd64_x8
+docker cp kuksa-databroker-client:amd64://usr/local/bin/libKuksaClient.so $pwd/lib/amd64
 
 ```
 
@@ -115,3 +132,26 @@ feed Vehicle.Body.Lights.Beam.Low.IsOn true
 #
 set Vehicle.Body.Lights.Beam.Low.IsOn true
 ```
+
+
+# Script
+
+## build_and_copy.sh
+Explanation
+
+1. Platforms Array:
+You define a list of platforms (e.g. linux/arm64 and linux/amd64) you want to build for. You can add or remove elements as needed. The script extracts the architecture portion (after the slash) to tag the image and name the output directory.
+
+2. Building the Image:
+The command
+docker buildx build --platform "${platform}" -t "${image_tag}" --load .
+builds the image for the given platform and loads it into your local Docker images with an appropriate tag.
+
+3. Extracting the .so File:
+The script creates a temporary container using docker create from the built image (without actually running it). It then uses docker cp to copy the /usr/local/bin/libKuksaClient.so file from the container to a host folder corresponding to the target architecture ($PWD/lib/arm64 or $PWD/lib/amd64).
+
+4. Cleanup:
+After copying the file, the temporary container is removed using docker rm.
+
+This script automates the multi-platform build process as well as the extraction of your specific shared library into a host directory.
+

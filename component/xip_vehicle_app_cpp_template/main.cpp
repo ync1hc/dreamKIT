@@ -1,4 +1,6 @@
 #include "KuksaClient.hpp"
+
+#include <iostream>
 #include <chrono>
 #include <thread>
 
@@ -23,15 +25,23 @@ int main(int argc, char **argv) {
   client.GetServerInfo();
 
   // Sample usage: get, set and get server info.
-  client.GetValue("Vehicle.Speed");
-  client.SetValue("Vehicle.Speed", 88.5f);
+  client.GetTargetValue("Vehicle.Speed");
+  client.GetCurrentValue("Vehicle.Speed");
+  client.SetCurrentValue("Vehicle.Speed", 88.5f);
+  client.SetTargetValue("Vehicle.Speed", 88.5f);
   // client.SetValue("Vehicle.Status", std::string("Active"));
   // client.SetValue("Vehicle.Enabled", true);
 
   // If there are signal paths, start subscriptions using the SubscriptionManager.
   if (!config.signalPaths.empty()) {
+      // Define a user callback that will be called for each update.
+      auto userCallback = [](const std::string &updatePath, const std::string &updateValue) {
+        std::cout << "[User Callback] Update for " << updatePath 
+                  << ": " << updateValue << std::endl;
+    };
     SubscriptionManager subManager(client, config.signalPaths);
-    subManager.startSubscriptions();
+    // Start subscriptions with the user callback.
+    subManager.startSubscriptions(userCallback);
 
     // Let subscriptions run for 30 seconds (adjust as needed).
     std::this_thread::sleep_for(std::chrono::seconds(30));

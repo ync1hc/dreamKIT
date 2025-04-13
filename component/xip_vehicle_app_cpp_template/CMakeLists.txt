@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(kuksa_databroker)
 
 # Use C++11 standard.
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find the required packages.
 find_package(Protobuf REQUIRED)
@@ -71,17 +72,44 @@ set(GENERATED_HDRS
     ${GENERATED_DIR}/kuksa/val/v1/val.grpc.pb.h
 )
 
-# Define your client source file(s) (adjust as needed).
-# In this example, we assume you have "client.cpp" in the project root.
-set(CLIENT_SRCS   main.cpp
-                  KuksaClient.cpp
+# Define your library source files.
+# The shared library will be built from KuksaClient.cpp and the generated sources.
+set(LIB_SOURCES 
+    KuksaClient.cpp
+    ${GENERATED_SRCS}
 )
 
-# Create an executable target.
-add_executable(KuksaDatabrokerClient ${CLIENT_SRCS} ${GENERATED_SRCS})
+# Create the shared library target named KuksaClient.
+add_library(KuksaClient SHARED ${LIB_SOURCES})
 
-# Add include directories. Add GENERATED_DIR so that headers can be included using their full relative path.
+target_include_directories(KuksaClient
+    PUBLIC ${PROJECT_SOURCE_DIR} ${GENERATED_DIR} ${Protobuf_INCLUDE_DIRS}
+)
+
+target_link_libraries(KuksaClient
+    PUBLIC gRPC::grpc++ protobuf::libprotobuf
+)
+
+# install lib
+install(TARGETS KuksaClient      DESTINATION lib)
+
+
+# Create an executable target for the client.
+set(CLIENT_SRCS main.cpp)
+add_executable(KuksaDatabrokerClient ${CLIENT_SRCS})
+
+target_include_directories(KuksaDatabrokerClient PRIVATE ${GENERATED_DIR} ${Protobuf_INCLUDE_DIRS})
+target_link_libraries(KuksaDatabrokerClient PRIVATE KuksaClient)
+
+# Set RPATH for the executable so it can find libKuksaClient.so at runtime.
+set_target_properties(KuksaDatabrokerClient PROPERTIES
+    BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR}"
+    INSTALL_RPATH "$ORIGIN"
+)
+
+
+# Add include directories for the executable.
 target_include_directories(KuksaDatabrokerClient PRIVATE ${GENERATED_DIR} ${Protobuf_INCLUDE_DIRS})
 
-# Link against gRPC and protobuf libraries.
-target_link_libraries(KuksaDatabrokerClient PRIVATE gRPC::grpc++ protobuf::libprotobuf)
+# Link the executable against the shared library.
+target_link_libraries(KuksaDatabrokerClient PRIVATE KuksaClient)

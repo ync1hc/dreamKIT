@@ -1,126 +1,95 @@
 #ifndef KUKSA_CLIENT_HPP
 #define KUKSA_CLIENT_HPP
 
-#include <vector>
 #include <string>
-#include <thread>
+#include <vector>
 #include <memory>
-#include <iostream>
-#include <sstream>
-
-// gRPC and Protobuf headers.
-#include <grpcpp/grpcpp.h>
-#include "kuksa/val/v1/val.grpc.pb.h"
-#include "kuksa/val/v1/types.pb.h"
-
-// Include the nlohmann/json header
-#include "nlohmann/json.hpp"
-using json = nlohmann::json;
+#include <functional>
 
 namespace KuksaClient {
 
-//------------------------------------------------------------------------------
-// Configuration structure & ConfigParser
-//------------------------------------------------------------------------------
+// A plain configuration structure.
 struct Config {
-  std::string serverURI;
-  bool debug = false;
-  std::vector<std::string> signalPaths;
+    std::string serverURI;
+    bool debug = false;
+    std::vector<std::string> signalPaths;
 };
 
+// A lightweight JSON-based configuration parser.
+// (Users of this API do not see any gRPC/Proto dependencies.)
 class ConfigParser {
 public:
-  // Parses the JSON file and loads the configuration into config.
-  // Returns true if parsing was successful.
-  static bool parse(const std::string &filename, Config &config);
+    // Parse the JSON config file specified by filename.
+    // Returns true if parsing succeeds, false otherwise.
+    static bool parse(const std::string &filename, Config &config);
 };
 
-//------------------------------------------------------------------------------
-// DataBrokerClient: Provides basic RPC methods to interact with the server.
-//------------------------------------------------------------------------------
+// Public API for the DataBroker client interface.
+// All gRPC/Proto details are hidden in the implementation.
 class DataBrokerClient {
 public:
-  DataBrokerClient();
+    DataBrokerClient();
+    ~DataBrokerClient();
 
-  // Connect to the server using the provided URI.
-  void Connect(const std::string &serverURI);
+    // Establish a connection to the server.
+    void Connect(const std::string &serverURI);
 
-  // Get the current value for an entry.
-  void GetValue(const std::string &entryPath);
+    // Get the current value for the specified entry.
+    void GetTargetValue(const std::string &entryPath);
+    void GetCurrentValue(const std::string &entryPath);
 
-  // Templated SetValue() function. It supports various types.
-  template<typename T>
-  void SetValue(const std::string &entryPath, const T &newValue) {
-    if (!stub_) {
-      std::cout << "Client not connected. Aborting SetValue()." << std::endl;
-      return;
-    }
-    kuksa::val::v1::SetRequest request;
-    auto* update = request.add_updates();
-    kuksa::val::v1::DataEntry* data_entry = update->mutable_entry();
-    data_entry->set_path(entryPath);
+    // Send a streamed update (for example, update a value).
+    void StreamedUpdate(const std::string &entryPath, float newValue);
 
-    // Call the helper overload to set the value.
-    setValueImpl(data_entry->mutable_value(), newValue);
+    // Define the callback type.
+    // The callback receives two strings: the path and the updated value.
+    using Callback = std::function<void(const std::string&, const std::string&)>;
+    // Subscribe to changes/updates for the given entry.
+    void Subscribe(const std::string &entryPath, Callback userCallback);
 
-    update->add_fields(kuksa::val::v1::FIELD_VALUE);
+    // Retrieve basic server information.
+    void GetServerInfo();
 
-    kuksa::val::v1::SetResponse response;
-    grpc::ClientContext context;
-    grpc::Status status = stub_->Set(&context, request, &response);
-    if (!status.ok()) {
-      std::cout << "Set() RPC failed: " << status.error_message() << std::endl;
-      return;
-    }
-    if (response.error().code() != 0) {
-      std::cout << "Set() global error: " << response.error().message() << std::endl;
-    } else {
-      std::cout << "SetValue(): Updated \"" << entryPath << "\" to " 
-                << DataPointToString(data_entry->value()) << std::endl;
-    }
-  }
-
-  // A streaming update example.
-  void StreamedUpdate(const std::string &entryPath, float newValue);
-
-  // Subscribe to changes for an entry.
-  void Subscribe(const std::string &entryPath);
-
-  // Get server info.
-  void GetServerInfo();
+    // Set the value of an entry.
+    // We provide several overloads (non-templated) to avoid "exposing" template code.
+    void SetCurrentValue(const std::string &entryPath, float newValue);
+    void SetCurrentValue(const std::string &entryPath, double newValue);
+    void SetCurrentValue(const std::string &entryPath, int32_t newValue);
+    void SetCurrentValue(const std::string &entryPath, int64_t newValue);
+    void SetCurrentValue(const std::string &entryPath, bool newValue);
+    void SetCurrentValue(const std::string &entryPath, const std::string &newValue);
+    
+    void SetTargetValue(const std::string &entryPath, float newValue);
+    void SetTargetValue(const std::string &entryPath, double newValue);
+    void SetTargetValue(const std::string &entryPath, int32_t newValue);
+    void SetTargetValue(const std::string &entryPath, int64_t newValue);
+    void SetTargetValue(const std::string &entryPath, bool newValue);
+    void SetTargetValue(const std::string &entryPath, const std::string &newValue);
 
 private:
-  std::shared_ptr<grpc::Channel> channel_;
-  std::unique_ptr<kuksa::val::v1::VAL::Stub> stub_;
-
-  // Helper to convert Datapoint to string.
-  static std::string DataPointToString(const kuksa::val::v1::Datapoint &dp);
-
-  // Overloaded helper functions to set a value in a Datapoint message.
-  static void setValueImpl(kuksa::val::v1::Datapoint *dp, float value);
-  static void setValueImpl(kuksa::val::v1::Datapoint *dp, double value);
-  static void setValueImpl(kuksa::val::v1::Datapoint *dp, int32_t value);
-  static void setValueImpl(kuksa::val::v1::Datapoint *dp, int64_t value);
-  static void setValueImpl(kuksa::val::v1::Datapoint *dp, uint32_t value);
-  static void setValueImpl(kuksa::val::v1::Datapoint *dp, uint64_t value);
-  static void setValueImpl(kuksa::val::v1::Datapoint *dp, bool value);
-  static void setValueImpl(kuksa::val::v1::Datapoint *dp, const std::string &value);
+    // The implementations of the above functions are hidden.
+    class Impl;
+    std::unique_ptr<Impl> pImpl;
 };
 
-//------------------------------------------------------------------------------
-// SubscriptionManager: Manages subscription threads for given signal paths.
-//------------------------------------------------------------------------------
+// The SubscriptionManager starts subscriptions in separate threads.
 class SubscriptionManager {
 public:
-  SubscriptionManager(DataBrokerClient &client, const std::vector<std::string> &paths);
-  void startSubscriptions();
-  void joinAll();
-  void detachAll();
+    SubscriptionManager(DataBrokerClient &client, const std::vector<std::string> &paths);
+    ~SubscriptionManager();
+
+    // Start one subscription thread per signal path.
+    void startSubscriptions(std::function<void(const std::string&, const std::string&)> userCallback);
+
+    // Optionally join all threads.
+    void joinAll();
+
+    // Alternatively, detach all subscription threads.
+    void detachAll();
 
 private:
-  DataBrokerClient &client_;
-  std::vector<std::string> signalPaths_;
-  std::vector<std::thread> threads_;
+    class Impl;
+    std::unique_ptr<Impl> pImpl;
 };
 
 } // namespace KuksaClient
