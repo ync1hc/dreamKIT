@@ -26,7 +26,7 @@ test_path = os.path.dirname(os.path.abspath(__file__))
 mapping_path = test_path + "/../../mapping/vss_4.0/vss_dbc.json"
 mapper: dbc2vssmapper.Mapper = dbc2vssmapper.Mapper(
     mapping_definitions_file=mapping_path,
-    dbc_file_names=[test_path + "/../../Model3CAN.dbc"])
+    dbc_file_names=[test_path + "/../../ModelCAN.dbc"])
 
 
 def test_current_gear():

@@ -29,7 +29,7 @@ import os
 
 test_path = os.path.dirname(os.path.abspath(__file__))
 mapping_path = test_path + "/test.json"
-dbc_file_names = [test_path + "/../../Model3CAN.dbc"]
+dbc_file_names = [test_path + "/../../ModelCAN.dbc"]
 mapper: dbc2vssmapper.Mapper = dbc2vssmapper.Mapper(mapping_path, dbc_file_names)
 
 

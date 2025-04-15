@@ -3,7 +3,7 @@ import json
 import os
 
 # Load the .dbc file
-dbc_file_path = 'Model3CAN.dbc'
+dbc_file_path = 'ModelCAN.dbc'
 db = cantools.database.load_file(dbc_file_path)
 
 # Define the name of the signal you're looking for and the default value for signals

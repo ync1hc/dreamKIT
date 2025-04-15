@@ -88,7 +88,7 @@ python3 ./dbcfeeder.py --val2dbc --dbc2val --use-socketcan --mapping mapping/vss
 2025-04-15 09:48:38,168 INFO dbcfeeder: VAL2DBC mode is: True
 2025-04-15 09:48:38,169 INFO dbcfeeder: Path to token information not given
 2025-04-15 09:48:38,169 INFO dbcfeeder: Starting CAN feeder
-2025-04-15 09:48:38,169 INFO dbcfeederlib.dbcparser: Reading definitions from bus description file Model3CAN.dbc
+2025-04-15 09:48:38,169 INFO dbcfeederlib.dbcparser: Reading definitions from bus description file ModelCAN.dbc
 ...
 2025-04-15 09:48:38,546 INFO dbcfeederlib.databrokerclientwrapper: Vehicle.Body.Lights.Beam.Low.IsOn is already registered with type BOOLEAN
 ...
