@@ -1,0 +1,3 @@
+*.vscode
+.vssclient_history
+*.pyc

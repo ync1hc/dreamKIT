@@ -132,7 +132,7 @@ Syntax
 (`dbc` can be used as synonym for `dbc2vss`)
 
 Specifying DBC signal name is mandatory. It must correspond to a DBC signal name defined in a DBC file.
-By default the DBC feeder use the [ModelCAN.dbc](../ModelCAN.dbc) example file.
+By default the DBC feeder use the [Model3CAN.dbc](../Model3CAN.dbc) example file.
 
 `interval_ms` and `on_change` are optional and control under which conditions a value shall be forwarded.
 The `interval_ms` value indicates the minimum interval between signals in milliseconds.

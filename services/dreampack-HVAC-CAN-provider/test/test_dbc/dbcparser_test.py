@@ -28,7 +28,7 @@ NON_EXISTING_CAN_FRAME_ID: int = 0x45
 
 # read config only once
 test_path = os.path.dirname(os.path.abspath(__file__))
-def_dbc = test_path + "/../../ModelCAN.dbc"
+def_dbc = test_path + "/../../Model3CAN.dbc"
 
 
 def test_default_dbc():

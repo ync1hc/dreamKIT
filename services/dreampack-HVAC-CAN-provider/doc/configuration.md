@@ -100,7 +100,7 @@ If KUKSA.val Databroker already has values for some of the signals expect someth
 $ LOG_LEVEL="INFO,dbcfeederlib.dbc2vssmapper=DEBUG" ./dbcfeeder.py --val2dbc --no-dbc2val --use-socketcan
 ...
 2023-06-02 11:01:22,474 INFO dbcfeeder: Starting CAN feeder
-2023-06-02 11:01:22,474 INFO dbcfeederlib.dbcparser: Reading DBC file ModelCAN.dbc
+2023-06-02 11:01:22,474 INFO dbcfeederlib.dbcparser: Reading DBC file Model3CAN.dbc
 2023-06-02 11:01:22,982 INFO dbcfeeder: Using mapping: mapping/vss_4.0/vss_dbc.json
 2023-06-02 11:01:22,985 INFO dbcfeederlib.dbc2vssmapper: Reading dbc configurations from mapping/vss_4.0/vss_dbc.json
 ...

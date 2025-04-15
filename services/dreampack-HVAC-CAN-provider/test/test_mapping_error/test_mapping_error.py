@@ -31,7 +31,7 @@ test_path = os.path.dirname(os.path.abspath(__file__))
 def test_unknown_transform(caplog: pytest.LogCaptureFixture):
 
     mapping_path = test_path + "/test_unknown_transform.json"
-    dbc_file_names = [test_path + "/../../ModelCAN.dbc"]
+    dbc_file_names = [test_path + "/../../Model3CAN.dbc"]
 
     with pytest.raises(SystemExit) as excinfo:
         dbc2vssmapper.Mapper(mapping_path, dbc_file_names)
@@ -43,7 +43,7 @@ def test_unknown_transform(caplog: pytest.LogCaptureFixture):
 def test_vss2dbc_sensor(caplog: pytest.LogCaptureFixture):
 
     mapping_path = test_path + "/mapping_vss2dbc_not_actuator.json"
-    dbc_file_names = [test_path + "/../../ModelCAN.dbc"]
+    dbc_file_names = [test_path + "/../../Model3CAN.dbc"]
 
     with pytest.raises(SystemExit) as excinfo:
         dbc2vssmapper.Mapper(mapping_path, dbc_file_names)
