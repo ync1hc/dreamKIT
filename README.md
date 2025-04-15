@@ -19,7 +19,9 @@ Feature overview for development, experimentation, and innovation:
 
   [![dreamKIT Introduction](https://img.youtube.com/vi/-DdnHqg3Qeg/hqdefault.jpg)](https://youtu.be/-DdnHqg3Qeg)
 
-# Architecture
+
+# dreamKIT components
+
 ![dreamKIT_architecture](https://docs.digital.auto/docs/dreamkit/architecture/images/dreamKIT_architecture.png)
 
 dreamKIT simplifies feature development with a complete device setup. It supports all components, from cloud to ECU, enabling you to easily build and integrate features of any complexity.
@@ -40,6 +42,11 @@ Learn more about Jetson AGX Orin [here](https://www.nvidia.com/en-sg/autonomous-
 We've created an example HVAC dreamPack with standard inputs and outputs to help you get started with Vehicle APIs. This provides a practical starting point for learning and experimentation.
 
  ![dreamPack](https://docs.digital.auto/docs/dreamkit/overview/images/Seamless_deployment.png)
+
+
+ ### Wiring
+
+ ![dreamkit wiring](https://bewebstudio.digitalauto.tech/data/projects/fuOFE9EXs7Mv/dreamkit-wiring.png)
 
 # Project Folder Struture
 ```
