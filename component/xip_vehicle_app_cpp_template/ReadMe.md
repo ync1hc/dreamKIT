@@ -37,11 +37,7 @@ pass: dev12345
 
 
 ```shell
-# One time required
-docker network create kuksa
-# Execute the kuksa-databroker (v0.4.4)
-docker run -dit --rm --name Server --network kuksa ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4 --insecure
-
+docker run -dit --rm --net=host --name Server ghcr.io/eclipse-kuksa/kuksa-databroker:0.5.0 --insecure
 ```
 
 # Development
@@ -53,9 +49,9 @@ docker run -dit --rm --name Server --network kuksa ghcr.io/eclipse-kuksa/kuksa-d
 docker build -t kuksa-databroker-client .
 
 # Execute
-docker run --rm --network kuksa kuksa-databroker-client:amd64
+docker run --rm --net=host kuksa-databroker-client:amd64
 # Debug
-docker run -it --entrypoint /bin/bash --network kuksa kuksa-databroker-client
+docker run -it --entrypoint /bin/bash kuksa-databroker-client:amd64
 ```
 
 ```shell
@@ -94,35 +90,38 @@ docker run -d -it --name kuksa-databroker-client --network host --restart unless
 
 ```shell
 # in a new terminal
-docker run -it --rm --network kuksa ghcr.io/eclipse-kuksa/kuksa-databroker-cli:0.4.4 --server Server:55555
-```
+kuksa-client grpc://127.0.0.1:55555
+# Result with (Kuksa Databroker Client (v1)
 
-The CLI provides an interactive prompt which can be used to send commands to the Databroker (databroker.v1, not databroker.v2).
-```shell
-  ⠀⠀⠀⢀⣤⣶⣾⣿⢸⣿⣿⣷⣶⣤⡀
-  ⠀⠀⣴⣿⡿⠋⣿⣿⠀⠀⠀⠈⠙⢿⣿⣦
-  ⠀⣾⣿⠋⠀⠀⣿⣿⠀⠀⣶⣿⠀⠀⠙⣿⣷
-  ⣸⣿⠇⠀⠀⠀⣿⣿⠠⣾⡿⠃⠀⠀⠀⠸⣿⣇⠀⠀⣶⠀⣠⡶⠂⠀⣶⠀⠀⢰⡆⠀⢰⡆⢀⣴⠖⠀⢠⡶⠶⠶⡦⠀⠀⠀⣰⣶⡀
-  ⣿⣿⠀⠀⠀⠀⠿⢿⣷⣦⡀⠀⠀⠀⠀⠀⣿⣿⠀⠀⣿⢾⣏⠀⠀⠀⣿⠀⠀⢸⡇⠀⢸⡷⣿⡁⠀⠀⠘⠷⠶⠶⣦⠀⠀⢠⡟⠘⣷
-  ⢹⣿⡆⠀⠀⠀⣿⣶⠈⢻⣿⡆⠀⠀⠀⢰⣿⡏⠀⠀⠿⠀⠙⠷⠄⠀⠙⠷⠶⠟⠁⠀⠸⠇⠈⠻⠦⠀⠐⠷⠶⠶⠟⠀⠠⠿⠁⠀⠹⠧
-  ⠀⢿⣿⣄⠀⠀⣿⣿⠀⠀⠿⣿⠀⠀⣠⣿⡿
-  ⠀⠀⠻⣿⣷⡄⣿⣿⠀⠀⠀⢀⣠⣾⣿⠟    databroker-cli
-  ⠀⠀⠀⠈⠛⠇⢿⣿⣿⣿⣿⡿⠿⠛⠁     v0.4.1
+     ⢀⣤⣶⣾⣿⢸⣿⣿⣷⣶⣤⡀
+    ⣴⣿⡿⠋⣿⣿   ⠈⠙⢿⣿⣦
+   ⣾⣿⠋  ⣿⣿  ⣶⣿  ⠙⣿⣷
+  ⣸⣿⠇   ⣿⣿⠠⣾⡿⠃   ⠸⣿⣇  ⣶ ⣠⡶⠂ ⣶  ⢰⡆ ⢰⡆⢀⣴⠖ ⢠⡶⠶⠶⡦   ⣰⣶⡀
+  ⣿⣿    ⠿⢿⣷⣦⡀     ⣿⣿  ⣿⢾⣏   ⣿  ⢸⡇ ⢸⡷⣿⡁  ⠘⠷⠶⠶⣦  ⢠⡟⠘⣷
+  ⢹⣿⡆   ⣿⣶⠈⢻⣿⡆   ⢰⣿⡏  ⠿ ⠙⠷⠄ ⠙⠷⠶⠟⠁ ⠸⠇⠈⠻⠦ ⠐⠷⠶⠶⠟ ⠠⠿⠁ ⠹⠧
+   ⢿⣿⣄  ⣿⣿  ⠿⣿  ⣠⣿⡿
+    ⠻⣿⣷⡄⣿⣿   ⢀⣠⣾⣿⠟    kuksa-client CLI
+     ⠈⠛⠇⢿⣿⣿⣿⣿⡿⠿⠛⠁     0.4.3
 
-Successfully connected to http://Server:55555/
-sdv.databroker.v1 >
+
+Connecting to VSS server at 127.0.0.1 port 55555 using KUKSA GRPC protocol.
+TLS will not be used.
+2025-04-16 15:42:42,823 INFO kuksa_client.grpc: No Root CA present, it will not be possible to use a secure connection!
+2025-04-16 15:42:42,823 INFO kuksa_client.grpc.aio: Establishing insecure channel
+2025-04-16 15:42:42,831 INFO kuksa_client.cli_backend.grpc: gRPC channel connected.
+Test Client>
 ```
 
 Get the vehicle's current speed
 ```shell
-get Vehicle.Speed
-```
-Set the vehicle's current/target speed
-```shell
-#
-feed Vehicle.Speed 18
-#
-set Vehicle.Speed 20
+
+# Set the vehicle's current/target speed
+setValue Vehicle.Body.Lights.Beam.Low.IsOn false
+setTargetValue Vehicle.Body.Lights.Beam.Low.IsOn true
+
+# Get the vehicle's current/target speed
+getValue Vehicle.Body.Lights.Beam.Low.IsOn
+getTargetValue Vehicle.Body.Lights.Beam.Low.IsOn
 ```
 
 Others VSS (by default, the application will subscribe to all "signal" mentioned in config.json)

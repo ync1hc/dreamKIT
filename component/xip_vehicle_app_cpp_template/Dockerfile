@@ -108,6 +108,7 @@ COPY --from=builder /usr/local/ /usr/local/
 COPY --from=builder /app/build/libKuksaClient.so /usr/local/bin
 COPY --from=builder /app/build/KuksaDatabrokerClient /usr/local/bin/KuksaDatabrokerClient
 COPY --from=builder /app/config.json /usr/local/bin/config.json
+# COPY --from=builder /app/build /usr/local/bin/build
 
 # Make sure the startup script has executable permissions.
 # RUN sed -i -e 's/\r$//' *.sh

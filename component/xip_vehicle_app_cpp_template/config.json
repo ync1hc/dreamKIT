@@ -1,6 +1,6 @@
 {
   "broker": {
-    "serverURI": "Server:55555"
+    "serverURI": "127.0.0.1:55555"
   },
   "signal": [
     {
