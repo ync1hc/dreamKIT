@@ -208,8 +208,18 @@ void KuksaClient::streamUpdate(const std::string &entryPath, float newValue) {
   }
 }
 
+void KuksaClient::subscribeTargetValue(const std::string &entryPath,
+  std::function<void(const std::string &, const std::string &)> userCallback) {
+  subscribe(entryPath, userCallback, FT_ACTUATOR_TARGET);
+}
+
+void KuksaClient::subscribeCurrentValue(const std::string &entryPath,
+  std::function<void(const std::string &, const std::string &)> userCallback) {
+  subscribe(entryPath, userCallback, FT_VALUE);
+}
+
 void KuksaClient::subscribe(const std::string &entryPath,
-    std::function<void(const std::string &, const std::string &)> userCallback) {
+    std::function<void(const std::string &, const std::string &)> userCallback, int field) {
   if (!pImpl->stub) {
     std::cerr << "Client not connected. Aborting subscribe()." << std::endl;
     return;
@@ -219,8 +229,13 @@ void KuksaClient::subscribe(const std::string &entryPath,
   subEntry->set_path(entryPath);
   // Here we use the proto’s own view for subscription.
   subEntry->set_view(kuksa::val::v1::VIEW_ALL);
-  subEntry->add_fields(kuksa::val::v1::FIELD_VALUE);
 
+  if (field == FT_ACTUATOR_TARGET) {
+    subEntry->add_fields(kuksa::val::v1::FIELD_ACTUATOR_TARGET);
+  } else { // FT_VALUE
+    subEntry->add_fields(kuksa::val::v1::FIELD_VALUE);
+  }
+  
   grpc::ClientContext context;
   auto reader = pImpl->stub->Subscribe(&context, request);
   std::cout << "Subscription: Listening on \"" << entryPath << "\"." << std::endl;
@@ -233,8 +248,15 @@ void KuksaClient::subscribe(const std::string &entryPath,
       const auto &upd = response.updates(i);
       std::string updatePath = upd.entry().path();
       // dataPointToString is used internally.
-      std::string updateValue = getValue(updatePath, GV_ALL, false);
-      std::cout << "  Update: " << updatePath << " -> " << updateValue << std::endl;
+      std::string updateValue;
+      if (field == FT_ACTUATOR_TARGET) {
+        updateValue = getTargetValue(entryPath);
+        std::cout << "  Update TargetValue: " << updatePath << " -> " << updateValue << std::endl;
+      } else { // FT_VALUE
+        updateValue = getCurrentValue(entryPath);
+        std::cout << "  Update CurrentValue: " << updatePath << " -> " << updateValue << std::endl;
+      }
+
       if (userCallback)
         userCallback(updatePath, updateValue);
     }
@@ -250,7 +272,12 @@ void KuksaClient::subscribe(const std::string &entryPath,
 void KuksaClient::subscribeAll(std::function<void(const std::string &, const std::string &)> userCallback) {
   for (const auto &path : signalPaths_) {
     subscriptionThreads_.emplace_back([this, path, userCallback]() {
-      subscribe(path, userCallback);
+      subscribeTargetValue(path, userCallback);
+    });
+  }
+  for (const auto &path : signalPaths_) {
+    subscriptionThreads_.emplace_back([this, path, userCallback]() {
+      subscribeCurrentValue(path, userCallback);
     });
   }
 }
