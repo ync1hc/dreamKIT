@@ -192,7 +192,6 @@ QJsonArray beautifyJsonArray(const QJsonArray &jsonArray) {
 // Function to make the network request
 bool queryMarketplacePackages(const QString &marketplace_url, const QString &token, int page = 1, int limit = 10, const QString &category = "vehicle") {
 // bool queryMarketplacePackages(int page = 1, int limit = 10, const QString &category = "vehicle") {
-    // QUrl url("https://store-be.sdv.digital.auto/package");
 
     QUrl url(marketplace_url + "/package");
     QUrlQuery query;
