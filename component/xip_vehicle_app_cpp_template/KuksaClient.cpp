@@ -209,17 +209,17 @@ void KuksaClient::streamUpdate(const std::string &entryPath, float newValue) {
 }
 
 void KuksaClient::subscribeTargetValue(const std::string &entryPath,
-  std::function<void(const std::string &, const std::string &)> userCallback) {
+  std::function<void(const std::string &, const std::string &, const int &)> userCallback) {
   subscribe(entryPath, userCallback, FT_ACTUATOR_TARGET);
 }
 
 void KuksaClient::subscribeCurrentValue(const std::string &entryPath,
-  std::function<void(const std::string &, const std::string &)> userCallback) {
+  std::function<void(const std::string &, const std::string &, const int &)> userCallback) {
   subscribe(entryPath, userCallback, FT_VALUE);
 }
 
 void KuksaClient::subscribe(const std::string &entryPath,
-    std::function<void(const std::string &, const std::string &)> userCallback, int field) {
+    std::function<void(const std::string &, const std::string &, const int &)> userCallback, int field) {
   if (!pImpl->stub) {
     std::cerr << "Client not connected. Aborting subscribe()." << std::endl;
     return;
@@ -258,7 +258,7 @@ void KuksaClient::subscribe(const std::string &entryPath,
       }
 
       if (userCallback)
-        userCallback(updatePath, updateValue);
+        userCallback(updatePath, updateValue, field);
     }
   }
   grpc::Status status = reader->Finish();
@@ -269,7 +269,7 @@ void KuksaClient::subscribe(const std::string &entryPath,
   }
 }
 
-void KuksaClient::subscribeAll(std::function<void(const std::string &, const std::string &)> userCallback) {
+void KuksaClient::subscribeAll(std::function<void(const std::string &, const std::string &, const int &)> userCallback) {
   for (const auto &path : signalPaths_) {
     subscriptionThreads_.emplace_back([this, path, userCallback]() {
       subscribeTargetValue(path, userCallback);

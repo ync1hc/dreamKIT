@@ -56,8 +56,14 @@ int main(int argc, char *argv[]) {
 
 
     // Start subscriptions for all configured signal paths.
-    client.subscribeAll([](const std::string &path, const std::string &value) {
-      std::cout << "[User Callback]: Update received for [" << path << "] -> " << value << std::endl;
+    client.subscribeAll([](const std::string &path, const std::string &value, const int &field) {
+      if (field == FT_ACTUATOR_TARGET) {
+        // updateValue = getTargetValue(entryPath);
+        std::cout << "[User Callback]: Update TargetValue received for [" << path << "] -> " << value << std::endl;
+      } else { // FT_VALUE
+        // updateValue = getCurrentValue(entryPath);
+        std::cout << "[User Callback]: Update CurrentValue received for [" << path << "] -> " << value << std::endl;
+      }
     });
     // Wait for subscriptions.
     client.joinAllSubscriptions();

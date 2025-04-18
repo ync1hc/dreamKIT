@@ -110,18 +110,18 @@ public:
   //--------------------------------------------------------------------------
   
   void subscribeTargetValue(const std::string &entryPath,
-                  std::function<void(const std::string &, const std::string &)> userCallback);
+                  std::function<void(const std::string &, const std::string &, const int &)> userCallback);
 
   void subscribeCurrentValue(const std::string &entryPath,
-                  std::function<void(const std::string &, const std::string &)> userCallback);
+                  std::function<void(const std::string &, const std::string &, const int &)> userCallback);
   // Subscribe to updates for a specific entry.
   // The provided callback is invoked with (entryPath, updateValue) for every update.
   void subscribe(const std::string &entryPath,
-                  std::function<void(const std::string &, const std::string &)> userCallback, int field);
+                  std::function<void(const std::string &, const std::string &, const int &)> userCallback, int field);
 
   // Subscribe to all signal paths (from our configuration).
   // Each subscription runs in its own thread.
-  void subscribeAll(std::function<void(const std::string &, const std::string &)> userCallback);
+  void subscribeAll(std::function<void(const std::string &, const std::string &, const int &)> userCallback);
 
   // Wait for all subscription threads to finish.
   void joinAllSubscriptions();

@@ -32,6 +32,9 @@ sudo ip link set br0 address 5e:5e:c9:a7:22:55
 # S32G
 sudo ifconfig br0 192.168.56.49
 
+# Ubuntu
+sudo ifconfig br0 192.168.56.3
+
 pass: dev12345
 ```
 
