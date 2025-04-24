@@ -1,21 +1,46 @@
 # dk_service_can_provider
 
-> Information: 
-This docker image provides a service to communicate with CAN bus based on CAN signal in .dbc file and vss singal.  
-
-## Presequisites
-dreamOS must be installed first. Refer to this script (\installation-scripts\jetson-orin\dk_install.sh) for dreamOS installation.  
+> **Overview**  
+> This Docker image provides a service to communicate with CAN bus based on CAN signals defined in `.dbc` files and VSS signals.
 
 
-# For localy Dev-Test
 
-## Presequisites
+## Table of Contents
+
+- [dk\_service\_can\_provider](#dk_service_can_provider)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Local Development and Testing](#local-development-and-testing)
+    - [Fix Shell Script Line Endings and Permissions](#fix-shell-script-line-endings-and-permissions)
+    - [Network Setup (Ubuntu VM \<-\> Jetson Orin \<-\> S32G)](#network-setup-ubuntu-vm---jetson-orin---s32g)
+    - [Local - Build and Test](#local---build-and-test)
+  - [S32G - Build and Test](#s32g---build-and-test)
+    - [Prepare the docker image (arm46)](#prepare-the-docker-image-arm46)
+    - [Deploy and run](#deploy-and-run)
+    - [Check CAN Bus](#check-can-bus)
+
+
+
+## Prerequisites
+
+- **dreamOS** must be installed prior to using this service.  
+  Refer to the installation script:  
+  `installation-scripts/jetson-orin/dk_install.sh`
+
+
+
+## Local Development and Testing
+
+### Fix Shell Script Line Endings and Permissions
+
 Fix potential error with sh file
 ```shell
 # Fix error at sh files
 sed -i -e 's/\r$//' *.sh
 chmod +x *.sh
 ```
+
+### Network Setup (Ubuntu VM <-> Jetson Orin <-> S32G)
 
 Having the Ubuntu VM connects to LAN network of Jetson Orin (addr:192.168.56.48) <> S32G (addr:192.168.56.49)
 ```shell
@@ -43,45 +68,37 @@ d5d708ec0fd5   phongbosch/dk_ivi:latest                       "/app/start.sh"   
 #
 # Connect to S32G
 ssh root@192.168.56.49
+# Connect to Pi
+ssh phong@192.168.56.49
+#
 # Check the list of docker
 root@s32g274ardb2:~# docker ps -a
 CONTAINER ID   IMAGE                                        COMMAND                  CREATED          STATUS                     PORTS                                                                                                                                     NAMES
 acf0daebb4fc   dk_service_can_provider:arm64                "/app/start.sh"          28 minutes ago   Up 24 minutes                                                                                                                                                        dk_service_can_provider
 ```
 
+### Local - Build and Test
 
-## Ubuntu
-### [ Ubuntu ] Run the vehicle service
-
+Create the Virtual CAN
 ```shell
-#
-# Having the design with your vss signal list
-Example with dbc_overlay.vspec (at /mapping/vss_4.0_custom/ folder)
-- vss: Vehicle.Body.Lights.Beam.Low.IsOn
-- vss2dbc: enabled - to receive the request from playgroud
-- --> transform/mapping: is required
-- dbc2vss: disable - to send the actual state back to playgroud
-
-Generate the vss_dbc.json file
-Refer to
-- https://github.com/eclipse-kuksa/kuksa-can-provider
-- https://github.com/COVESA/vss-tools 
-
-Update the dbc_default_values.json file for the default value of new added vss signals
-Example with
-"DAS_headlightRequest" : 0,
-
-```
-
-```shell
-#
-# Create the Virtual CAN
-./createvcan.sh vcan0
+./prepare-dbc-file/createvcan.sh vcan0
 # Observe the CAN network
 candump vcan0 &
+```
 
-# Execute Natively
-python3 ./dbcfeeder.py --val2dbc --dbc2val --use-socketcan --mapping mapping/vss_4.0_custom/vss_dbc.json --canport vcan0
+Build & run Docker image
+```shell
+#
+# Build
+docker build -t dk_service_can_provider:latest --file Dockerfile .
+# 
+# Run the docker
+docker stop dk_service_can_provider; docker rm dk_service_can_provider
+docker run -d -it --name dk_service_can_provider --net=host -e LOG_LEVEL=INFO -e CAN_PORT=vcan0 dk_service_can_provider
+```
+
+Debug
+```shell
 # The console with output
 2025-04-15 09:48:38,167 INFO dbcfeeder: Reading configuration from file: config/dbc_feeder.ini
 2025-04-15 09:48:38,168 INFO dbcfeeder: DBC2VAL mode is: True
@@ -104,47 +121,30 @@ python3 ./dbcfeeder.py --val2dbc --dbc2val --use-socketcan --mapping mapping/vss
 2025-04-15 09:48:38,672 INFO dbcfeeder: Starting to process CAN signals
 ```
 
-
-### [ Ubuntu > Jetson Orin ] Run the kuksa-client
+Test
 ```shell
 #
 # Testing with executing the kuksa-client python version
-kuksa-client
+kuksa-client grpc://127.0.0.1:55555
+# or
+kuksa-client grpc://192.168.56.48:55555
 
-# the console output with
-sdv-orin@ubuntu:~$ kuksa-client
+#
+# Supported API
+setTargetValue Vehicle.Body.Lights.Beam.Low.IsOn true/false
+setTargetValue Vehicle.Body.Lights.Hazard.IsSignaling true/false
+setTargetValue Vehicle.Body.Lights.IsBrakeOn true/false
+setTargetValue Vehicle.Cabin.Seat.Row1.Pos1.Position {0-3}
+setTargetValue Vehicle.Cabin.HVAC.Station.Row1.Right.FanSpeed {0-100}
+setTargetValue Vehicle.Cabin.HVAC.Station.Row1.Left.FanSpeed {0-100}
 
-     ⢀⣤⣶⣾⣿⢸⣿⣿⣷⣶⣤⡀
-    ⣴⣿⡿⠋⣿⣿   ⠈⠙⢿⣿⣦
-   ⣾⣿⠋  ⣿⣿  ⣶⣿  ⠙⣿⣷
-  ⣸⣿⠇   ⣿⣿⠠⣾⡿⠃   ⠸⣿⣇  ⣶ ⣠⡶⠂ ⣶  ⢰⡆ ⢰⡆⢀⣴⠖ ⢠⡶⠶⠶⡦   ⣰⣶⡀
-  ⣿⣿    ⠿⢿⣷⣦⡀     ⣿⣿  ⣿⢾⣏   ⣿  ⢸⡇ ⢸⡷⣿⡁  ⠘⠷⠶⠶⣦  ⢠⡟⠘⣷
-  ⢹⣿⡆   ⣿⣶⠈⢻⣿⡆   ⢰⣿⡏  ⠿ ⠙⠷⠄ ⠙⠷⠶⠟⠁ ⠸⠇⠈⠻⠦ ⠐⠷⠶⠶⠟ ⠠⠿⠁ ⠹⠧
-   ⢿⣿⣄  ⣿⣿  ⠿⣿  ⣠⣿⡿
-    ⠻⣿⣷⡄⣿⣿   ⢀⣠⣾⣿⠟    kuksa-client CLI
-     ⠈⠛⠇⢿⣿⣿⣿⣿⡿⠿⠛⠁     0.4.2
-
-Default tokens directory: /home/sdv-orin/.local/lib/python3.8/site-packages/kuksa_client/kuksa_server_certificates/jwt
-
-Connecting to VSS server at 127.0.0.1 port 55555 using KUKSA GRPC protocol.
-TLS will not be used.
-INFO 2025-04-15 09:49:07,844 kuksa_client.grpc No Root CA present, it will not be possible to use a secure connection!
-INFO 2025-04-15 09:49:07,844 kuksa_client.grpc.aio Establishing insecure channel
-gRPC channel connected.
-Test Client> 
-
-
+#
 # Request the LowBeam state
 Test Client> setTargetValue Vehicle.Body.Lights.Beam.Low.IsOn true
 OK
 Test Client> setTargetValue Vehicle.Body.Lights.Beam.Low.IsOn false
 OK
-
-# To exit the kuksa-client
-Test Client> exit
-gRPC channel disconnected.
-
-
+#
 # Expected with receiving CAN message
 # LowBeam ~ On
 vcan0  3E9   [8]  00 00 00 00 00 00 00 00
@@ -153,9 +153,9 @@ vcan0  3E9   [8]  01 00 00 00 00 00 00 00
 ```
 
 
-## S32G
+## S32G - Build and Test
 
-Prepare the docker image (arm46) in Ubuntu and deploy to S32G
+### Prepare the docker image (arm46)
 ```shell
 # Build for arm64
 docker buildx build --platform linux/arm64 -t dk_service_can_provider:arm64 --load .
@@ -165,21 +165,24 @@ docker save -o dk_service_can_provider.tar dk_service_can_provider:arm64
 scp dk_service_can_provider.tar root@192.168.56.49:~/sdvdemo/docker
 ```
 
-Load and run the docker container
+### Deploy and run
 ```shell
 cd ~/sdvdemo/docker
 # Load the docker image
 docker load -i dk_service_can_provider.tar
 # Run the docker
 docker stop dk_service_can_provider; docker rm dk_service_can_provider
-docker run --restart=always -d --name dk_service_can_provider --net=host -e LOG_LEVEL=INFO dk_service_can_provider:arm64
+docker run --restart unless-stopped -d --name dk_service_can_provider --net=host -e LOG_LEVEL=INFO  -e CAN_PORT=can1 dk_service_can_provider:arm64
 
 # Remove (optional)
 docker image rm -f dk_service_can_provider:arm64
 ```
 
-Test the CAN connection
+### Check CAN Bus
+
 ```shell
+#
+#Test the CAN connection
 cd ~/sdvdemo/tool
 # LowBeam ~ On
 ./cansend can1 3E9#0000000000000000
@@ -189,28 +192,4 @@ cd ~/sdvdemo/tool
 
 
 
-# For MarketPlace (TBD)
 
-## build docker image
-local-arch build  
-```
-docker build -t dk_service_can_provider:latest --file Dockerfile .
-```
-
-multi-arch build and push to docker hub  
-```
-docker buildx create --name dk_service_can_provider_multiarch_build --use
-docker buildx build --platform linux/amd64,linux/arm64 -t xxx/dk_service_can_provider:latest --push .
-```
-
-## run local built docker container
-```
-docker kill 671b621fcc2b5c69999ebc50;docker rm 671b621fcc2b5c69999ebc50;docker run -d -it --name 671b621fcc2b5c69999ebc50 --log-opt max-size=10m --log-opt max-file=3 -v /home/$USER/.dk/dk_installedservices/671b621fcc2b5c69999ebc50:/app/runtime --network host  -v /home/$USER/.dk/dk_manager/vssmapping/dbc_default_values.json:/app/vss/dbc_default_values.json:ro  -v /home/$USER/.dk/dk_vssgeneration/vss.json:/app/vss/vss.json:ro dk_service_can_provider:latest
-```
-
-## run docker container from docker hub
-```
-docker pull xxx/dk_service_can_provider:latest
-docker kill 671b621fcc2b5c69999ebc50;docker rm 671b621fcc2b5c69999ebc50
-docker run -d -it --name 671b621fcc2b5c69999ebc50 --log-opt max-size=10m --log-opt max-file=3 -v /home/$USER/.dk/dk_installedservices/671b621fcc2b5c69999ebc50:/app/runtime --network host  -v /home/$USER/.dk/dk_manager/vssmapping/dbc_default_values.json:/app/vss/dbc_default_values.json:ro  -v /home/$USER/.dk/dk_vssgeneration/vss.json:/app/vss/vss.json:ro xxx/dk_service_can_provider:latest
-```
