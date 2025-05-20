@@ -1,8 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.Material
 import "../resource/customwidgets"
-import AppAsync 1.0
+import MarketplaceAsync 1.0
 //import Qt5Compat.GraphicalEffects
 
 Rectangle {
@@ -11,8 +12,8 @@ Rectangle {
     layer.enabled: true
     //width: 778
     //height: 1025
-    width: Screen.width
-    height: Screen.height
+    width: parent.width
+    height: parent.height
 
 //     property alias searchTextInput: searchTextInput
 
@@ -39,7 +40,6 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        appAsync.initInstalledAppFromDB()
         appAsync.initMarketplaceListFromDB()
     }
 
@@ -89,7 +89,9 @@ Rectangle {
             if(matchApp && !matchApp.is_installed) {
                 activeAppName = matchApp.name
                 installAppIndex = appListView.currentIndex
-                installAppPopup.open()
+                if (notifArea.visible === false) {
+                    installAppPopup.open()
+                }
             }
             //             appListView.currentIndex = -1
         }
@@ -111,7 +113,7 @@ Rectangle {
                 console.log("onEditingFinished, isSearchTextInputEmpty = ", isSearchTextInputEmpty)
                 return
             } else {
-                searchApp()
+                // searchApp()
             }
 
             isSearchTextInputEmpty = false
@@ -130,7 +132,7 @@ Rectangle {
         }
     }
 
-    AppAsync {
+    MarketplaceAsync {
         id: appAsync
         onClearAppInfoToAppList: () =>
         {
@@ -181,6 +183,10 @@ Rectangle {
             marketplace_comboBox_model.append({text: name});
             marketplace_comboBox.currentIndex = 0
         }
+
+        onSetInstallServiceRunningStatus: (status) => {
+            notifArea.visible = status
+        }
     }
 
     Dialog {
@@ -195,6 +201,7 @@ Rectangle {
             appAsync.installApp(installAppIndex)
             installAppPopup.close()
             appListView.currentIndex = -1
+            notifArea.visible = true
         }
         onRejected: {
             console.log("install rejected clicked")
@@ -226,6 +233,7 @@ Rectangle {
                     verticalAlignment: Text.AlignVCenter
                     color: "white"
                     font.pointSize: 16
+                    wrapMode: Text.WordWrap
                 }
             }
 
@@ -286,9 +294,9 @@ Rectangle {
     Rectangle {
         id: searchAppRec
         x: 38
-        y: 100
-        width: 740
-        height: 460*2
+        y: 0
+        width: parent.width
+        height: parent.height
         clip: true
         color: "transparent"
         border.color: "#d7d9cc"
@@ -302,8 +310,8 @@ Rectangle {
             currentIndex: -1
             x: 19
             y: 143
-            width: 721
-            height: 279*2
+            width: parent.width - 100
+            height: parent.height - 100
             clip: true
 
             function setActiveIndex(index) {
@@ -332,7 +340,7 @@ Rectangle {
                     Rectangle {
                         x: row1.height + 30
                         height: appListViewItem.height
-                        width: 300
+                        width: parent.width
                         color: "#00000000"
                         clip: true
                         Text {
@@ -433,7 +441,7 @@ Rectangle {
             orientation: ListView.Horizontal
             clip: true
             currentIndex: -1
-            spacing: 16
+            spacing: 30
             highlight: Rectangle {
                 color: "transparent"
 
@@ -449,7 +457,7 @@ Rectangle {
             delegate: Item {
                 id: item2
                 x: 5
-                width: 140
+                width: 150
                 height: 40
 
                 Rectangle {
@@ -463,6 +471,7 @@ Rectangle {
                         font.family: "Arial"
                         horizontalAlignment: Text.AlignHCenter
                         anchors.centerIn: parent
+                        wrapMode: Text.WordWrap
                     }
                 }
 
@@ -501,7 +510,7 @@ Rectangle {
                 y: 0
                 width: 47
                 height: 50
-                btnIconSource: "../icons/search.png"
+                btnIconSource: "../resource/search.png"
                 iconWidth: 24
                 iconHeight: 24
                 colorDefault: "#00ececec"
@@ -534,22 +543,54 @@ Rectangle {
                 clip: true
             }
         }
-    }
 
-    Text {
-        text: "SDV Market Place"
-        x: 30
-        y: 30
-        font.bold: true
-        font.pointSize: 20
-        color: "#8BC34A"
-        font.family: "Arial"
+        Rectangle {
+            id: notifArea
+            x: search_area.x + search_area.width + 20
+            y: search_area.y
+            width: 600
+            height: 50
+            visible: false
+            color: "#10ebebeb"
+            radius: 10
+            layer.enabled: true
+
+            BusyIndicator {
+                id: busyIndicator
+                running: true   // set to false to stop
+                width: 35
+                height: 35
+                Material.accent: "#29B6F6"
+
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: 10  // optional spacing from left edge
+            }
+
+            Text {
+                id: notifAreaText
+                x: 49
+                width: 500
+                height: 50
+                text: "Installation service is running. Please wait ..."
+                anchors.verticalCenter: parent.verticalCenter
+                font.letterSpacing: 1
+                font.pixelSize: 16
+                horizontalAlignment: Text.AlignLeft
+                verticalAlignment: Text.AlignVCenter
+                font.styleName: "Regular"
+                font.bold: true
+                font.family: "Arial"
+                color: "#60ebebeb"
+                clip: true
+            }
+        }
     }
 
     ComboBox {
         id: marketplace_comboBox
         x: parent.width - 300
-        y: 30
+        y: 0
         width: 250
         height: 40
         editable: false
@@ -600,16 +641,16 @@ Rectangle {
         }
     }
     
-    ImgOverlay {
-        id: icon_installed
-        x: 56
-        y: 50
-        width: 24
-        height: 24
-        active_img_source: "../icons/search.png"
-        default_img_source: "../icons/cloud-download-alt.png"
-        default_color_overlay: "#95ebebeb"
-    }
+    // ImgOverlay {
+    //     id: icon_installed
+    //     x: 56
+    //     y: 50
+    //     width: 24
+    //     height: 24
+    //     active_img_source: "../resource/search.png"
+    //     default_img_source: "../resource/cloud-download-alt.png"
+    //     default_color_overlay: "#95ebebeb"
+    // }
     
     Item {
         id: __materialLibrary__
