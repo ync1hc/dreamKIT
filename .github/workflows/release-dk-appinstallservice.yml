@@ -39,5 +39,7 @@ jobs:
           context: ./dreamos-core/dk_appinstallservice
           file: ./dreamos-core/dk_appinstallservice/Dockerfile
           push: ${{ steps.docker_login.outcome == 'success' }}
-          tags: ghcr.io/${{ env.OWNER }}/dk_appinstallservice:${{ env.TAG }}
+          tags: |
+            ghcr.io/${{ env.OWNER }}/dk_appinstallservice:${{ env.TAG }}
+            ghcr.io/${{ env.OWNER }}/dk_appinstallservice:latest
           platforms: linux/amd64,linux/arm64
