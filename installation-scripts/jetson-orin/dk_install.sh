@@ -124,6 +124,14 @@ docker stop dk_manager; docker rm dk_manager; docker run -d -it --name dk_manage
 
 echo "------------------------------------------------------------------------------------------------------------------------------------"
 echo "------------------------------------------------------------------------------------------------------------------------------------"
+DOCKER_HUB_NAMESPACE="phongbosch"
+echo "Install vss_generation ..."
+docker pull $DOCKER_HUB_NAMESPACE/dk_vssgeneration_image:vss4.0
+docker rm vssgen;docker run -it --name vssgen -v $HOME_DIR/.dk/dk_vssgeneration/:/app/dk_vssgeneration -v $HOME_DIR/.dk/dk_manager/vssmapping/vssmapping_overlay.vspec:/app/.dk/dk_manager/vssmapping/vssmapping_overlay.vspec:ro $LOG_LIMIT_PARAM $DOCKER_HUB_NAMESPACE/dk_vssgeneration_image:vss4.0
+
+DOCKER_HUB_NAMESPACE="ghcr.io/samtranbosch"
+echo "------------------------------------------------------------------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------------------------------------------------------------------"
 echo "Install App/service installation service ... "
 docker pull $DOCKER_HUB_NAMESPACE/dk_appinstallservice:latest
 

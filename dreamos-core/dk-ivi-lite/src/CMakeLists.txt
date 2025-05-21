@@ -27,6 +27,7 @@ qt_add_qml_module(dk_ivi
     VERSION 1.0
     QML_FILES
         main/main.qml
+        main/settings.qml
         controls/controls.qml
         controls/ModeControl.qml
         controls/ToggleButton.qml

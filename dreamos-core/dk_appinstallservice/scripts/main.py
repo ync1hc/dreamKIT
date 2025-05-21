@@ -434,41 +434,41 @@ def main():
         return
     time.sleep(0.5)
 
-    print('-' * 50)
-    # restart vehicledatabroker to reload new api set
-    cmd = f"docker stop vehicledatabroker"
-    result = cmd_execute(cmd)
-    if result == False:
-        print(f"Error: can't stop vehicledatabroker")
-        return
-    time.sleep(0.5)
-    cmd = f"docker start vehicledatabroker"
-    result = cmd_execute(cmd)
-    if result == False:
-        print(f"Error: can't restart vehicledatabroker")
-        return
-    else:
-        print("Successfully restart vehicledatabroker")
+    # print('-' * 50)
+    # # restart vehicledatabroker to reload new api set
+    # cmd = f"docker stop vehicledatabroker"
+    # result = cmd_execute(cmd)
+    # if result == False:
+    #     print(f"Error: can't stop vehicledatabroker")
+    #     return
+    # time.sleep(0.5)
+    # cmd = f"docker start vehicledatabroker"
+    # result = cmd_execute(cmd)
+    # if result == False:
+    #     print(f"Error: can't restart vehicledatabroker")
+    #     return
+    # else:
+    #     print("Successfully restart vehicledatabroker")
 
-    print('-' * 50)
-    # restart dk_manager to reload new api set
-    cmd = f"docker restart dk_manager"
-    result = cmd_execute(cmd)
-    if result == False:
-        print(f"Error: can't restart dk_manager")
-        return
-    else:
-        print("Successfully restart dk_manager")
+    # print('-' * 50)
+    # # restart dk_manager to reload new api set
+    # cmd = f"docker restart dk_manager"
+    # result = cmd_execute(cmd)
+    # if result == False:
+    #     print(f"Error: can't restart dk_manager")
+    #     return
+    # else:
+    #     print("Successfully restart dk_manager")
 
-    print('-' * 50)
-    # restart dk_manager to reload new api set
-    cmd = f"docker kill dk_ivi;docker start dk_ivi"
-    result = cmd_execute(cmd)
-    if result == False:
-        print(f"Error: can't restart dk_ivi")
-        return
-    else:
-        print("Successfully restart dk_ivi")
+    # print('-' * 50)
+    # # restart dk_manager to reload new api set
+    # cmd = f"docker kill dk_ivi;docker start dk_ivi"
+    # result = cmd_execute(cmd)
+    # if result == False:
+    #     print(f"Error: can't restart dk_ivi")
+    #     return
+    # else:
+    #     print("Successfully restart dk_ivi")
 
     print('-' * 50)
     if (DeployTarget == "vip"):
