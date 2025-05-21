@@ -1,4 +1,4 @@
-name: Release DK Manager Docker Image
+name: Release DK AppInstallService Docker Image
 on:
   push:
     tags:
@@ -37,8 +37,8 @@ jobs:
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v5
         with:
-          context: ./dreamos-core/dk-manager
-          file: ./dreamos-core/dk-manager/Dockerfile
+          context: ./dreamos-core/dk_appinstallservice
+          file: ./dreamos-core/dk_appinstallservice/Dockerfile
           push: ${{ steps.docker_login.outcome == 'success' }}
-          tags: ghcr.io/${{ github.repository_owner }}/dk_manager:${{ env.TAG }}
+          tags: ghcr.io/${{ github.repository_owner }}/dk_appinstallservice:${{ env.TAG }}
           platforms: linux/amd64,linux/arm64
