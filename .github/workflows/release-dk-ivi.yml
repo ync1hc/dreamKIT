@@ -49,5 +49,7 @@ jobs:
           context: ./dreamos-core/dk-ivi-lite
           file: ./dreamos-core/dk-ivi-lite/Dockerfile
           push: ${{ steps.docker_login.outcome == 'success' }}
-          tags: ghcr.io/${{ env.OWNER }}/dk_ivi:${{ env.TAG }}
+          tags: |
+            ghcr.io/${{ env.OWNER }}/dk_ivi:${{ env.TAG }}
+            ghcr.io/${{ env.OWNER }}/dk_ivi:latest
           platforms: linux/amd64,linux/arm64
