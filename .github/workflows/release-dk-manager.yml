@@ -41,5 +41,7 @@ jobs:
           context: ./dreamos-core/dk-manager
           file: ./dreamos-core/dk-manager/Dockerfile
           push: ${{ steps.docker_login.outcome == 'success' }}
-          tags: ghcr.io/${{ env.OWNER }}/dk_manager:${{ env.TAG }}
+          tags: |
+            ghcr.io/${{ env.OWNER }}/dk_manager:${{ env.TAG }}
+            ghcr.io/${{ env.OWNER }}/dk_manager:latest
           platforms: linux/amd64,linux/arm64
