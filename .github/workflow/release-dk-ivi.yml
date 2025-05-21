@@ -1,14 +1,13 @@
-          build-args: |
-            TARGETARCH=${TARGETARCH}name: Release DK IVI Docker Image
+name: Release DK IVI Docker Image
 on:
   push:
     tags:
       - 'v*.*.*'
 jobs:
-  release:
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
     steps:
       - name: Checkout repository
@@ -35,11 +34,19 @@ jobs:
           echo "TAG=$TAG"  # output for debug
           echo "::set-output name=TAG::$TAG"  # deprecated but kept for backward compatibility
       
+      # Create the target arch directories if they don't exist
+      - name: Prepare library directories
+        run: |
+          mkdir -p ./dreamos-core/dk-ivi-lite/src/library/target/amd64
+          mkdir -p ./dreamos-core/dk-ivi-lite/src/library/target/arm64
+          touch ./dreamos-core/dk-ivi-lite/src/library/target/amd64/.placeholder
+          touch ./dreamos-core/dk-ivi-lite/src/library/target/arm64/.placeholder
+      
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v5
         with:
           context: ./dreamos-core/dk-ivi-lite
+          file: ./dreamos-core/dk-ivi-lite/Dockerfile
           push: ${{ steps.docker_login.outcome == 'success' }}
           tags: ghcr.io/${{ github.repository_owner }}/dk_ivi:${{ env.TAG }}
           platforms: linux/amd64,linux/arm64
-          file: ./dreamos-core/dk-ivi-lite/Dockerfile
