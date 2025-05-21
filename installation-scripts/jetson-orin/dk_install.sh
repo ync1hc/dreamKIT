@@ -57,7 +57,7 @@ HOME_DIR="/home/$DK_USER"
 DOCKER_SHARE_PARAM="-v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker"
 DOCKER_AUDIO_PARAM="--device /dev/snd --group-add audio -e PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native -v ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native -v $HOME_DIR/.config/pulse/cookie:/root/.config/pulse/cookie"
 LOG_LIMIT_PARAM="--log-opt max-size=10m --log-opt max-file=3"
-DOCKER_HUB_NAMESPACE="tbd"
+DOCKER_HUB_NAMESPACE="ghcr.io/samtranbosch"
 
 echo "Env Variables:"
 echo "DK_USER: $DK_USER"
@@ -112,6 +112,12 @@ docker pull ghcr.io/eclipse/kuksa.val/kuksa-client:0.4.2
 
 echo "------------------------------------------------------------------------------------------------------------------------------------"
 echo "------------------------------------------------------------------------------------------------------------------------------------"
+echo "Install sdv-runtime ..."
+docker pull ghcr.io/eclipse-autowrx/sdv-runtime:latest
+docker stop sdv-runtime; docker rm sdv-runtime; docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME="DreamKIT_BGSV" -p 55555:55555 -e ARCH=$ARCH ghcr.io/eclipse-autowrx/sdv-runtime:latest
+
+echo "------------------------------------------------------------------------------------------------------------------------------------"
+echo "------------------------------------------------------------------------------------------------------------------------------------"
 echo "Install dk_manager ..."
 docker pull $DOCKER_HUB_NAMESPACE/dk_manager:latest
 docker stop dk_manager; docker rm dk_manager; docker run -d -it --name dk_manager $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM  -v $HOME_DIR/.dk:/app/.dk --restart unless-stopped -e USER=$DK_USER -e DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/dk_manager:latest
@@ -142,10 +148,10 @@ if [[ "$dk_ivi_value" == "true" ]]; then
     echo "Checking for NVIDIA Target Board..."
     if [ -f "/etc/nv_tegra_release" ]; then
         echo "NVIDIA Jetson board detected."
-        docker stop dk_ivi; docker rm dk_ivi ; docker run -d -it --name dk_ivi -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=:0 -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR -e QT_QUICK_BACKEND=software --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT="/app/.dk/" $DOCKER_HUB_NAMESPACE/dk_ivi:latest
+        docker stop dk_ivi; docker rm dk_ivi ; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR -e QT_QUICK_BACKEND=software --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT="/app/.dk/" $DOCKER_HUB_NAMESPACE/dk_ivi:latest
     else
         echo "Not NVIDIA board."
-        docker stop dk_ivi; docker rm dk_ivi ; docker run -d -it --name dk_ivi -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=:0 -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --device /dev/dri:/dev/dri --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT="/app/.dk/" $DOCKER_HUB_NAMESPACE/dk_ivi:latest
+        docker stop dk_ivi; docker rm dk_ivi ; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --device /dev/dri:/dev/dri --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT="/app/.dk/" $DOCKER_HUB_NAMESPACE/dk_ivi:latest
     fi
 else
     echo "To Install dk_ivi, run './dk_install dk_ivi=true'"
@@ -226,12 +232,6 @@ cat <<EOF > $DK_SWHISTORY_FILE
 EOF
 
 echo "$DK_SWHISTORY_FILE created with timestamp ${timestamp}"
-
-echo "------------------------------------------------------------------------------------------------------------------------------------"
-echo "------------------------------------------------------------------------------------------------------------------------------------"
-echo "Install OS SW Update service ... "
-docker pull $DOCKER_HUB_NAMESPACE/dk_swupdate:latest
-docker stop dk_swupdate; docker rm dk_swupdate; docker run -d -it --name dk_swupdate $LOG_LIMIT_PARAM -v /var/run/docker.sock:/var/run/docker.sock --network host -v $HOME_DIR/.dk:/app/.dk --restart unless-stopped -e DK_HOME="/app" $DOCKER_HUB_NAMESPACE/dk_swupdate:latest
 
 echo "------------------------------------------------------------------------------------------------------------------------------------"
 echo "------------------------------------------------------------------------------------------------------------------------------------"

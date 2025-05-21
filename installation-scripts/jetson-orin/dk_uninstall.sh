@@ -12,7 +12,7 @@ echo "username: $DK_USER"
 
 # Set Env Variables
 HOME_DIR="/home/$DK_USER"
-DOCKER_HUB_NAMESPACE="xxx"
+DOCKER_HUB_NAMESPACE="ghcr.io/samtranbosch"
 DK_CONTAINER_LIST="dk_manager dk_ivi dk_vssgen vehicledatabroker"
 
 echo "Env Variables:"
@@ -41,8 +41,14 @@ docker rmi -f $DOCKER_HUB_NAMESPACE/dk_vssgeneration_image:vss4.0
 echo "Delete dk_ivi image ..."
 docker rmi -f $DOCKER_HUB_NAMESPACE/dk_ivi:latest
 
+echo "Delete sdv-runtime image ..."
+docker rmi -f ghcr.io/eclipse-autowrx/sdv-runtime:latest
+
 echo "Delete vehicledatabroker image ..."
 docker rmi -f ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4
+
+echo "Delete App/service installation service image ..."
+docker rmi -f $DOCKER_HUB_NAMESPACE/dk_appinstallservice
 
 echo "Remove network ..."
 docker network rm dk_network
