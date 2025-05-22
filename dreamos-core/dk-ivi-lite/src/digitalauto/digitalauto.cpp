@@ -360,7 +360,7 @@ Q_INVOKABLE void DigitalAutoAppAsync::executeApp(const QString name, const QStri
         cmd = "";
 
         // start digital.auto app
-        cmd += "docker kill " + appId + ";docker rm " + appId + ";docker run -d -it --name " + appId + " --log-opt max-size=10m --log-opt max-file=3 -v /home/" + DK_VCU_USERNAME + "/.dk/dk_vssgeneration/vehicle_gen/:/home/vss/vehicle_gen:ro -v /home/" + DK_VCU_USERNAME + "/.dk/dk_app_python_template/target/" + DK_ARCH + "/python-packages:/home/python-packages:ro --network dk_network -v /home/" + DK_VCU_USERNAME + "/.dk/dk_manager/prototypes/" + appId + ":/app/exec " + DK_DOCKER_HUB_NAMESPACE + "/dk_app_python_template:baseimage";
+        cmd += "docker kill " + appId + ";docker rm " + appId + ";docker run -d -it --name " + appId + " --log-opt max-size=10m --log-opt max-file=3 -v /home/" + DK_VCU_USERNAME + "/.dk/dk_vssgeneration/vehicle_gen/:/home/vss/vehicle_gen:ro -v /home/" + DK_VCU_USERNAME + "/.dk/dk_app_python_template/target/" + DK_ARCH + "/python-packages:/home/python-packages:ro --network host -v /home/" + DK_VCU_USERNAME + "/.dk/dk_manager/prototypes/" + appId + ":/app/exec " + DK_DOCKER_HUB_NAMESPACE + "/dk_app_python_template:baseimage";
         qDebug() << cmd;
         system(cmd.toUtf8());
 
