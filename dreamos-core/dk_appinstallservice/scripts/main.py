@@ -416,23 +416,23 @@ def main():
     print("Successfully update vssmapping overlay.")
 
     time.sleep(0.5)
-    print('-' * 50)
-    # restart vssgen to update new api lib
-    cmd = f"docker restart vssgen"
-    result = cmd_execute(cmd)
-    if result == False:
-        print(f"Error: can't restart vssgen")
-        return
-    else:
-        print("Successfully restart vssgen")
+    # print('-' * 50)
+    # # restart vssgen to update new api lib
+    # cmd = f"docker restart vssgen"
+    # result = cmd_execute(cmd)
+    # if result == False:
+    #     print(f"Error: can't restart vssgen")
+    #     return
+    # else:
+    #     print("Successfully restart vssgen")
 
-    time.sleep(0.5)
-    cmd = f"sync"
-    result = cmd_execute(cmd)
-    if result == False:
-        print(f"Error: can't update vssgen")
-        return
-    time.sleep(0.5)
+    # time.sleep(0.5)
+    # cmd = f"sync"
+    # result = cmd_execute(cmd)
+    # if result == False:
+    #     print(f"Error: can't update vssgen")
+    #     return
+    # time.sleep(0.5)
 
     # print('-' * 50)
     # # restart vehicledatabroker to reload new api set
