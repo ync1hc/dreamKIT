@@ -10,16 +10,16 @@ Rectangle {
     height: Screen.height
     visible: true
     color: "#0F0F0F"
-    
+
     property string dreamKIT_ID: ''
     property string activeAppName: ""
     property string deleteAppName: ""
-    
+
     Component.onCompleted: {
         daAppListModel.clear()
         digitalAutoAppAsync.initSubscribeAppFromDB()
     }
-    
+
     DigitalAutoAppAsync {
         id: digitalAutoAppAsync
 
@@ -67,8 +67,8 @@ Rectangle {
             startAppBusyIndicator.visible = false
             startAppBusyIndicator.running = false
         }
-        
-        onUpdateAppRunningSts: (appId, isStarted, idx) => {                                 
+
+        onUpdateAppRunningSts: (appId, isStarted, idx) => {
             var chkItem = daSubscribeListview.itemAtIndex(idx);
             var chkItemChildren = chkItem.children;
             for( var i = 0 ; i < chkItemChildren.length ; ++i) {
@@ -83,7 +83,7 @@ Rectangle {
             }
         }
     }
-    
+
     // Enhanced popup dialogs with modern styling
     Dialog {
         id: startSubscribePopup
@@ -103,7 +103,7 @@ Rectangle {
             radius: 20
             border.color: "#00D4AA40"
             border.width: 2
-            
+
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: -4
@@ -175,13 +175,13 @@ Rectangle {
                 height: 48
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: startSubscribePopup.accepted()
-                
+
                 background: Rectangle {
                     color: parent.hovered ? "#00E5BB" : "#00D4AA"
                     radius: 24
                     Behavior on color { ColorAnimation { duration: 200 } }
                 }
-                
+
                 contentItem: Text {
                     text: parent.text
                     color: "#FFFFFF"
@@ -216,7 +216,7 @@ Rectangle {
             }
             daSubscribeListview.currentIndex = -1
         }
-        
+
         onRejected: {
             console.log("unsubscribe: rejected clicked")
             unSubscribePopup.close()
@@ -235,7 +235,7 @@ Rectangle {
             radius: 20
             border.color: "#FF444460"
             border.width: 2
-            
+
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: -4
@@ -291,7 +291,7 @@ Rectangle {
                     width: 120
                     height: 48
                     onClicked: unSubscribePopup.rejected()
-                    
+
                     background: Rectangle {
                         color: parent.hovered ? "#353535" : "#2A2A2A"
                         radius: 24
@@ -300,7 +300,7 @@ Rectangle {
                         Behavior on color { ColorAnimation { duration: 200 } }
                         Behavior on border.color { ColorAnimation { duration: 200 } }
                     }
-                    
+
                     contentItem: Text {
                         text: parent.text
                         color: "#FFFFFF"
@@ -317,13 +317,13 @@ Rectangle {
                     width: 120
                     height: 48
                     onClicked: unSubscribePopup.accepted()
-                    
+
                     background: Rectangle {
                         color: parent.hovered ? "#FF6666" : "#FF4444"
                         radius: 24
                         Behavior on color { ColorAnimation { duration: 200 } }
                     }
-                    
+
                     contentItem: Text {
                         text: parent.text
                         color: "#FFFFFF"
@@ -352,7 +352,7 @@ Rectangle {
             removeAppPopup.close()
             daSubscribeListview.currentIndex = -1
         }
-        
+
         onRejected: {
             console.log("removeAppPopup: rejected clicked")
             removeAppPopup.close()
@@ -364,7 +364,7 @@ Rectangle {
             radius: 20
             border.color: "#FF444460"
             border.width: 2
-            
+
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: -4
@@ -420,7 +420,7 @@ Rectangle {
                     width: 120
                     height: 48
                     onClicked: removeAppPopup.rejected()
-                    
+
                     background: Rectangle {
                         color: parent.hovered ? "#353535" : "#2A2A2A"
                         radius: 24
@@ -429,7 +429,7 @@ Rectangle {
                         Behavior on color { ColorAnimation { duration: 200 } }
                         Behavior on border.color { ColorAnimation { duration: 200 } }
                     }
-                    
+
                     contentItem: Text {
                         text: parent.text
                         color: "#FFFFFF"
@@ -446,13 +446,13 @@ Rectangle {
                     width: 120
                     height: 48
                     onClicked: removeAppPopup.accepted()
-                    
+
                     background: Rectangle {
                         color: parent.hovered ? "#FF6666" : "#FF4444"
                         radius: 24
                         Behavior on color { ColorAnimation { duration: 200 } }
                     }
-                    
+
                     contentItem: Text {
                         text: parent.text
                         color: "#FFFFFF"
@@ -467,44 +467,73 @@ Rectangle {
         }
     }
 
-    // Modern header with device ID
+    // Modern header with device ID (improved visibility)
     Rectangle {
         id: headerArea
         width: parent.width
-        height: 80
+        height: 110
         color: "transparent"
         z: 100
 
-        Row {
+        // Device ID Card
+        Rectangle {
+            id: deviceIdCard
+            width: Math.min(540, parent.width * 0.80)
+            height: 88
+            radius: 22
+            anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 32
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 16
+            color: "#181818"
+            border.color: dreamKIT_ID ? "#00D4AA90" : "#FF444490"
+            border.width: 2
+            //elevation: 4 // Uncomment if using Material style
 
-            Rectangle {
-                width: 8
-                height: 8
-                radius: 4
-                color: dreamKIT_ID ? "#00D4AA" : "#FF4444"
-                
-                SequentialAnimation on opacity {
-                    running: dreamKIT_ID
-                    loops: Animation.Infinite
-                    NumberAnimation { to: 0.3; duration: 1000 }
-                    NumberAnimation { to: 1.0; duration: 1000 }
+            Row {
+                anchors.fill: parent
+                anchors.margins: 22
+                spacing: 24
+
+                Rectangle {
+                    width: 18
+                    height: 18
+                    radius: 9
+                    color: dreamKIT_ID ? "#00D4AA" : "#FF4444"
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    SequentialAnimation on opacity {
+                        running: dreamKIT_ID
+                        loops: Animation.Infinite
+                        NumberAnimation { to: 0.3; duration: 1000 }
+                        NumberAnimation { to: 1.0; duration: 1000 }
+                    }
                 }
-            }
 
-            Text {
-                text: dreamKIT_ID ? `Device ID: ${dreamKIT_ID}` : "Device Disconnected"
-                color: dreamKIT_ID ? "#00D4AA" : "#FF4444"
-                font.family: "Segoe UI"
-                font.pixelSize: 14
-                font.weight: Font.Medium
+                Column {
+                    spacing: 4
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    Text {
+                        text: dreamKIT_ID ? "Device ID:" : ""
+                        color: dreamKIT_ID ? "#B0FFF2" : "#FFAAAA"
+                        font.family: "Segoe UI"
+                        font.pixelSize: 28
+                        font.weight: Font.DemiBold
+                        visible: dreamKIT_ID
+                    }
+                    Text {
+                        text: dreamKIT_ID ? dreamKIT_ID : "Device Disconnected"
+                        color: dreamKIT_ID ? "#00D4AA" : "#FF4444"
+                        font.family: "Segoe UI"
+                        font.pixelSize: dreamKIT_ID ? 32 : 32
+                        font.weight: Font.Bold
+                        wrapMode: Text.Wrap
+                    }
+                }
             }
         }
     }
-    
+
     // Modern progress bar
     ProgressBar {
         id: dd_downloadprogress
@@ -529,7 +558,7 @@ Rectangle {
             height: parent.height
             radius: 4
             color: "#00D4AA"
-            
+
             Rectangle {
                 anchors.fill: parent
                 color: "#FFFFFF40"
