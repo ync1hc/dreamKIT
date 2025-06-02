@@ -179,6 +179,9 @@ void ControlsAsync::qml_setApi_seat_driverSide_position(int position)
     VAPI_CLIENT.setCurrentValue(DK_VAPI_DATABROKER, 
                                VehicleAPI::V_Ca_Seat_R1_DriverSide_Position, 
                                posValue);
+    VAPI_CLIENT.setTargetValue(DK_VAPI_DATABROKER, 
+                               VehicleAPI::V_Ca_Seat_R1_DriverSide_Position, 
+                               posValue);
 
     // Subscribe to verify changes
     VAPI_CLIENT.subscribe(DK_VAPI_DATABROKER,
