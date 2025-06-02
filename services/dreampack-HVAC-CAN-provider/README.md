@@ -132,11 +132,11 @@ kuksa-client grpc://192.168.56.48:55555
 #
 # Supported API
 setTargetValue Vehicle.Body.Lights.Beam.Low.IsOn true/false
+setTargetValue Vehicle.Body.Lights.Beam.High.IsOn true/false
 setTargetValue Vehicle.Body.Lights.Hazard.IsSignaling true/false
-setTargetValue Vehicle.Body.Lights.IsBrakeOn true/false
-setTargetValue Vehicle.Cabin.Seat.Row1.Pos1.Position {0-3}
-setTargetValue Vehicle.Cabin.HVAC.Station.Row1.Right.FanSpeed {0-100}
-setTargetValue Vehicle.Cabin.HVAC.Station.Row1.Left.FanSpeed {0-100}
+setTargetValue Vehicle.Cabin.Seat.Row1.DriverSide.Position {0-3}
+setTargetValue Vehicle.Cabin.HVAC.Station.Row1.Passenger.FanSpeed {0-100}
+setTargetValue Vehicle.Cabin.HVAC.Station.Row1.Driver.FanSpeed {0-100}
 
 #
 # Request the LowBeam state
