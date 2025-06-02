@@ -25,10 +25,11 @@ Rectangle {
         }
         onUpdateWidget_hvac_driverSide_FanSpeed: (speed) => {
             // Convert 0-10 range to 0-100 percentage
-            fanSlider.value = speed * 10
+            driverFanSlider.value = speed * 10
         }
         onUpdateWidget_hvac_passengerSide_FanSpeed: (speed) => {
-            // Use driver side as master for unified control
+            // Convert 0-10 range to 0-100 percentage
+            passengerFanSlider.value = speed * 10
         }
         onUpdateWidget_seat_driverSide_position: (position) => {
             seatLevels.currentLevel = position
@@ -568,7 +569,7 @@ Rectangle {
                         spacing: 15
 
                         Text {
-                            text: "Fan Control"
+                            text: "Fan Controls"
                             font.pixelSize: 20
                             font.family: "Segoe UI"
                             font.weight: Font.Medium
@@ -576,12 +577,13 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
 
+                        // Driver Fan Control
                         Column {
                             width: parent.width
                             spacing: 10
 
                             Text {
-                                text: "Speed: " + fanSlider.value + "%"
+                                text: "Driver: " + driverFanSlider.value + "%"
                                 font.pixelSize: 16
                                 color: "#B0B0B0"
                                 font.family: "Segoe UI"
@@ -589,7 +591,7 @@ Rectangle {
                             }
 
                             Slider {
-                                id: fanSlider
+                                id: driverFanSlider
                                 width: parent.width
                                 from: 0
                                 stepSize: 10
@@ -601,22 +603,21 @@ Rectangle {
                                         // Convert percentage to 0-10 range for backend
                                         let backendValue = Math.round(value / 10)
                                         controlPageAsync.qml_setApi_hvac_driverSide_FanSpeed(backendValue)
-                                        controlPageAsync.qml_setApi_hvac_passengerSide_FanSpeed(backendValue)
                                     }
                                 }
 
                                 background: Rectangle {
-                                    x: fanSlider.leftPadding
-                                    y: fanSlider.topPadding + fanSlider.availableHeight / 2 - height / 2
+                                    x: driverFanSlider.leftPadding
+                                    y: driverFanSlider.topPadding + driverFanSlider.availableHeight / 2 - height / 2
                                     implicitWidth: 200
                                     implicitHeight: 8
-                                    width: fanSlider.availableWidth
+                                    width: driverFanSlider.availableWidth
                                     height: implicitHeight
                                     radius: 4
                                     color: "#2A2A2A"
 
                                     Rectangle {
-                                        width: fanSlider.visualPosition * parent.width
+                                        width: driverFanSlider.visualPosition * parent.width
                                         height: parent.height
                                         color: "#00D4AA"
                                         radius: 4
@@ -624,12 +625,72 @@ Rectangle {
                                 }
 
                                 handle: Rectangle {
-                                    x: fanSlider.leftPadding + fanSlider.visualPosition * (fanSlider.availableWidth - width)
-                                    y: fanSlider.topPadding + fanSlider.availableHeight / 2 - height / 2
+                                    x: driverFanSlider.leftPadding + driverFanSlider.visualPosition * (driverFanSlider.availableWidth - width)
+                                    y: driverFanSlider.topPadding + driverFanSlider.availableHeight / 2 - height / 2
                                     implicitWidth: 24
                                     implicitHeight: 24
                                     radius: 12
-                                    color: fanSlider.pressed ? "#FFFFFF" : "#F0F0F0"
+                                    color: driverFanSlider.pressed ? "#FFFFFF" : "#F0F0F0"
+                                    border.color: "#00D4AA"
+                                    border.width: 2
+                                }
+                            }
+                        }
+
+                        // Passenger Fan Control
+                        Column {
+                            width: parent.width
+                            spacing: 10
+
+                            Text {
+                                text: "Passenger: " + passengerFanSlider.value + "%"
+                                font.pixelSize: 16
+                                color: "#B0B0B0"
+                                font.family: "Segoe UI"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                            }
+
+                            Slider {
+                                id: passengerFanSlider
+                                width: parent.width
+                                from: 0
+                                stepSize: 10
+                                to: 100
+                                value: 0
+
+                                onValueChanged: {
+                                    if (pressed) {
+                                        // Convert percentage to 0-10 range for backend
+                                        let backendValue = Math.round(value / 10)
+                                        controlPageAsync.qml_setApi_hvac_passengerSide_FanSpeed(backendValue)
+                                    }
+                                }
+
+                                background: Rectangle {
+                                    x: passengerFanSlider.leftPadding
+                                    y: passengerFanSlider.topPadding + passengerFanSlider.availableHeight / 2 - height / 2
+                                    implicitWidth: 200
+                                    implicitHeight: 8
+                                    width: passengerFanSlider.availableWidth
+                                    height: implicitHeight
+                                    radius: 4
+                                    color: "#2A2A2A"
+
+                                    Rectangle {
+                                        width: passengerFanSlider.visualPosition * parent.width
+                                        height: parent.height
+                                        color: "#00D4AA"
+                                        radius: 4
+                                    }
+                                }
+
+                                handle: Rectangle {
+                                    x: passengerFanSlider.leftPadding + passengerFanSlider.visualPosition * (passengerFanSlider.availableWidth - width)
+                                    y: passengerFanSlider.topPadding + passengerFanSlider.availableHeight / 2 - height / 2
+                                    implicitWidth: 24
+                                    implicitHeight: 24
+                                    radius: 12
+                                    color: passengerFanSlider.pressed ? "#FFFFFF" : "#F0F0F0"
                                     border.color: "#00D4AA"
                                     border.width: 2
                                 }
