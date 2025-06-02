@@ -13,3 +13,6 @@ cp /scripts/daemon.json /etc/docker/daemon.json
 # Restart docker daemon
 systemctl restart docker
 
+# Can ultilities
+chmod +x /tools/*
+cp /scripts/* /usr/local/bin
