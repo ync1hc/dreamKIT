@@ -26,7 +26,7 @@ SPINNER_FRAMES=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
 PROGRESS_CHARS=("▱" "▰")
 
 # Global variables for progress tracking
-TOTAL_STEPS=12
+TOTAL_STEPS=13
 CURRENT_STEP=0
 
 # Function to show animated banner
@@ -331,13 +331,13 @@ main() {
     # Step 8: SDV Runtime
     show_step 8 "SDV Runtime" "Setting up Software Defined Vehicle runtime environment"
     
-    docker_pull_with_info "ghcr.io/eclipse-autowrx/sdv-runtime:latest" \
+    docker_pull_with_info "ghcr.io/eclipse-autowrx/sdv-runtime:0f74dac3bbdbe487f3e5970135c264c442ee865f" \
         "Eclipse AutoWrx SDV runtime for vehicle application management" \
         "GitHub Container Registry (Eclipse AutoWrx Project)"
     
     show_info "Configuring SDV runtime container..."
     run_with_feedback "docker stop sdv-runtime 2>/dev/null || true; docker rm sdv-runtime 2>/dev/null || true" "Cleaned up existing SDV runtime" "Cleanup warning"
-    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=\"DreamKIT_BGSV\" --network host -e ARCH=$ARCH ghcr.io/eclipse-autowrx/sdv-runtime:latest" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
+    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=\"DreamKIT_BGSV\" --network host -e ARCH=$ARCH ghcr.io/eclipse-autowrx/sdv-runtime:0f74dac3bbdbe487f3e5970135c264c442ee865f" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
     
     # Step 9: DreamKit Manager
     show_step 9 "DreamKit Manager" "Installing core management services"
@@ -372,8 +372,20 @@ main() {
         "DreamOS application installation and lifecycle management service" \
         "GitHub Container Registry (DreamOS Project)"
     
-    # Step 12: IVI Interface (Optional)
-    show_step 12 "IVI Interface" "Configuring In-Vehicle Infotainment system"
+    # Step 12: Docker local registry (Optional)
+    show_step 12 "Docker local registry" "VIP installation"
+    dk_vip_demo="false"
+    echo -e "\n${YELLOW}Do you want to continue? [y/N]: ${NC}"
+    read -r install_dockerlocalregistry_choice
+    
+    if [[ "$install_dockerlocalregistry_choice" =~ ^[Yy]$ ]]; then
+        dk_vip_demo="true"
+        show_info "Setup local registry..."
+        run_with_feedback "$CURRENT_DIR/scripts/setup_local_docker_registry.sh" "Docker local host enabled" "Docker local setup failed"
+    fi
+
+    # Step 13: IVI Interface (Optional)
+    show_step 13 "IVI Interface" "Configuring In-Vehicle Infotainment system"
     
     # Check for dk_ivi parameter
     dk_ivi_value=""
@@ -391,10 +403,10 @@ main() {
         
         if [ -f "/etc/nv_tegra_release" ]; then
             show_info "NVIDIA Jetson board detected - optimizing for hardware"
-            run_with_feedback "docker stop dk_ivi 2>/dev/null || true; docker rm dk_ivi 2>/dev/null || true; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR -e QT_QUICK_BACKEND=software --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT=\"/app/.dk/\" $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI started (NVIDIA optimized)" "Failed to start IVI"
+            run_with_feedback "docker stop dk_ivi 2>/dev/null || true; docker rm dk_ivi 2>/dev/null || true; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR -e QT_QUICK_BACKEND=software --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_VIP=$dk_vip_demo -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT=\"/app/.dk/\" $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI started (NVIDIA optimized)" "Failed to start IVI"
         else
             show_info "Standard hardware detected - using generic configuration"
-            run_with_feedback "docker stop dk_ivi 2>/dev/null || true; docker rm dk_ivi 2>/dev/null || true; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --device /dev/dri:/dev/dri --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT=\"/app/.dk/\" $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI started (standard)" "Failed to start IVI"
+            run_with_feedback "docker stop dk_ivi 2>/dev/null || true; docker rm dk_ivi 2>/dev/null || true; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --device /dev/dri:/dev/dri --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_VIP=$dk_vip_demo -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT=\"/app/.dk/\" $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI started (standard)" "Failed to start IVI"
         fi
     else
         show_info "IVI installation skipped"
@@ -411,10 +423,10 @@ main() {
             
             if [ -f "/etc/nv_tegra_release" ]; then
                 show_info "NVIDIA Jetson board detected - optimizing for hardware"
-                run_with_feedback "docker stop dk_ivi 2>/dev/null || true; docker rm dk_ivi 2>/dev/null || true; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR -e QT_QUICK_BACKEND=software --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT=\"/app/.dk/\" $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI started (NVIDIA optimized)" "Failed to start IVI"
+                run_with_feedback "docker stop dk_ivi 2>/dev/null || true; docker rm dk_ivi 2>/dev/null || true; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR -e QT_QUICK_BACKEND=software --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_VIP=$dk_vip_demo -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT=\"/app/.dk/\" $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI started (NVIDIA optimized)" "Failed to start IVI"
             else
                 show_info "Standard hardware detected - using generic configuration"
-                run_with_feedback "docker stop dk_ivi 2>/dev/null || true; docker rm dk_ivi 2>/dev/null || true; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --device /dev/dri:/dev/dri --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT=\"/app/.dk/\" $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI started (standard)" "Failed to start IVI"
+                run_with_feedback "docker stop dk_ivi 2>/dev/null || true; docker rm dk_ivi 2>/dev/null || true; docker run -d -it --name dk_ivi --network host -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY -e XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR --device /dev/dri:/dev/dri --restart unless-stopped $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk -e DKCODE=dreamKIT -e DK_USER=$DK_USER -e DK_VIP=$dk_vip_demo -e DK_DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e DK_ARCH=$ARCH -e DK_CONTAINER_ROOT=\"/app/.dk/\" $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI started (standard)" "Failed to start IVI"
             fi
             # Update the environment variable to reflect the installation
             dk_ivi_value="true"
