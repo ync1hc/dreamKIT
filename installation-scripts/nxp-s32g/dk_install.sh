@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Enable the Service to Start at Boot
-cp /scripts/dreamos-setup.service /etc/systemd/system/
+cp scripts/dreamos-setup.service /etc/systemd/system/
 
 systemctl daemon-reload
 systemctl enable dreamos-setup.service
@@ -14,5 +14,5 @@ cp /scripts/daemon.json /etc/docker/daemon.json
 systemctl restart docker
 
 # Can ultilities
-chmod +x /tools/*
-cp /scripts/* /usr/local/bin
+chmod +x tools/.
+cp -r tools/* /usr/local/bin
