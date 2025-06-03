@@ -172,22 +172,22 @@ void ControlsAsync::qml_setApi_seat_driverSide_position(int position)
 
     qDebug() << "Setting driver seat position to:" << position << "(" << positionDesc << ")";
     
-    // Convert to uint8_t to match the VSS datatype
     uint8_t posValue = static_cast<uint8_t>(position);
     
-    // Use the specific uint8_t overload
+    // Set both CurrentValue and TargetValue
     VAPI_CLIENT.setCurrentValue(DK_VAPI_DATABROKER, 
                                VehicleAPI::V_Ca_Seat_R1_DriverSide_Position, 
                                posValue);
+    VAPI_CLIENT.setTargetValue(DK_VAPI_DATABROKER, 
+                               VehicleAPI::V_Ca_Seat_R1_DriverSide_Position, 
+                               posValue);
 
-    // Subscribe to verify changes
-    VAPI_CLIENT.subscribe(DK_VAPI_DATABROKER,
-                         {VehicleAPI::V_Ca_Seat_R1_DriverSide_Position},
-                         [](const std::string& path, const std::string& value) {
-                             qDebug() << "Position subscription update for path:" 
-                                     << QString::fromStdString(path)
-                                     << "value:" << QString::fromStdString(value);
-                         });
+    // Verify the value was set correctly
+    std::string currentValue;
+    VAPI_CLIENT.getTargetValue(DK_VAPI_DATABROKER, 
+                              VehicleAPI::V_Ca_Seat_R1_DriverSide_Position, 
+                              currentValue);
+    qDebug() << "Value verified after setting:" << QString::fromStdString(currentValue);
 }
 
 void ControlsAsync::qml_setApi_hvac_driverSide_FanSpeed(uint8_t speed)
