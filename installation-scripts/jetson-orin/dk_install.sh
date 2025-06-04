@@ -265,6 +265,20 @@ main() {
     fi
     show_info "System architecture: ${BOLD}$ARCH${NC} (${ARCH_DETECT})"
     
+    # Create the serial_number file, which will be referred by dk_manager, sdv-runtime, dk_ivi
+    serial_file="/home/$DK_USER/.dk/dk_manager/serial-number"
+    # Ensure the directory exists
+    sudo mkdir -p "$(dirname "$serial_file")"
+    # If the file doesn't exist or is empty, generate a random 16-character hex string
+    if [[ ! -s "$serial_file" ]]; then
+        serial_number=$(openssl rand -hex 8)  # 8 bytes = 16 hex chars
+        echo "$serial_number" > "$serial_file"
+    else
+        serial_number=$(tail -n 1 "$serial_file")
+    fi
+    # Get last 8 characters (if the line is shorter, will print the whole line)
+    RUNTIME_NAME="dreamKIT-${serial_number: -8}"
+
     sleep 1
     show_success "Environment detection completed"
     
@@ -336,8 +350,9 @@ main() {
         "GitHub Container Registry (Eclipse AutoWrx Project)"
     
     show_info "Configuring SDV runtime container..."
+    show_info "RUNTIME_NAME: $RUNTIME_NAME"
     run_with_feedback "docker stop sdv-runtime 2>/dev/null || true; docker rm sdv-runtime 2>/dev/null || true" "Cleaned up existing SDV runtime" "Cleanup warning"
-    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=\"DreamKIT_BGSV\" --network host -e ARCH=$ARCH ghcr.io/eclipse-autowrx/sdv-runtime:0f74dac3bbdbe487f3e5970135c264c442ee865f" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
+    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=\"$RUNTIME_NAME\" --network host -e ARCH=$ARCH ghcr.io/eclipse-autowrx/sdv-runtime:0f74dac3bbdbe487f3e5970135c264c442ee865f" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
     
     # Step 9: DreamKit Manager
     show_step 9 "DreamKit Manager" "Installing core management services"
