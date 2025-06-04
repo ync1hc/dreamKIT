@@ -41,6 +41,13 @@ Note:
 sed -i -e 's/\r$//' *.sh
 chmod +x *.sh
 ```
+- If facing problem with launching the dk_ivi (cpp/qt application), the potential error with '$DISPLAY' may be empty.
+That is one of input variable for the dk_ivi application. User may face the probem when connecting remotely via SSH.
+Let's install from machine's console directly or update the 'dk_install.sh' with replace '$DISPLAY' by ':0' or ':1' (depending on your environment).
+Related command
+```shell
+echo $DISPLAY
+```
 
 ## Un-Installation guide
 ```shell
