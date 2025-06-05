@@ -67,8 +67,8 @@ At this release version, it's required user to double check the heathy state for
 
 ### sdv-runtime
 
-The default RUNTIMENAME is "DreamKIT_BGSV", which will be referred by https://playground.digital.auto/ later.
-User can freely adjust via navigate to "-e RUNTIME_NAME=\"DreamKIT_BGSV\"" from dk_install.sh script.
+The RUNTIMENAME is "dreamKIT-{randum-serial-number}", which will be referred by https://playground.digital.auto/ later.
+User can freely adjust via navigate to "RUNTIME_NAME="dreamKIT-${serial_number: -8}"" from dk_install.sh script.
 
 
 ```shell

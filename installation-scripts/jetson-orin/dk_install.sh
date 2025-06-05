@@ -26,7 +26,7 @@ SPINNER_FRAMES=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
 PROGRESS_CHARS=("▱" "▰")
 
 # Global variables for progress tracking
-TOTAL_STEPS=13
+TOTAL_STEPS=12
 CURRENT_STEP=0
 
 # Function to show animated banner
@@ -364,31 +364,16 @@ main() {
     show_info "Configuring DreamKit manager container..."
     run_with_feedback "docker stop dk_manager 2>/dev/null || true; docker rm dk_manager 2>/dev/null || true" "Cleaned up existing manager" "Manager cleanup"
     run_with_feedback "docker run -d -it --name dk_manager $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk --restart unless-stopped -e USER=$DK_USER -e DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/dk_manager:latest" "DreamKit manager started with Docker socket access" "Failed to start manager"
-    
-    # Step 10: VSS Generation
-    show_step 10 "VSS Generation" "Setting up Vehicle Signal Specification generator"
-    
-    DOCKER_HUB_NAMESPACE_TEMP="phongbosch"
-    docker_pull_with_info "$DOCKER_HUB_NAMESPACE_TEMP/dk_vssgeneration_image:vss4.0" \
-        "Vehicle Signal Specification generator v4.0 for automotive data modeling" \
-        "Docker Hub (phongbosch repository)"
-    
-    show_info "Running VSS generation process..."
-    run_with_feedback "docker rm vssgen 2>/dev/null || true" "Cleaned up VSS generator" "VSS cleanup"
-    run_with_feedback "docker run -it --name vssgen -v $HOME_DIR/.dk/dk_vssgeneration/:/app/dk_vssgeneration -v $HOME_DIR/.dk/dk_manager/vssmapping/vssmapping_overlay.vspec:/app/.dk/dk_manager/vssmapping/vssmapping_overlay.vspec:ro $LOG_LIMIT_PARAM $DOCKER_HUB_NAMESPACE_TEMP/dk_vssgeneration_image:vss4.0" "VSS generation completed" "VSS generation failed"
-    
-    DOCKER_HUB_NAMESPACE="ghcr.io/samtranbosch"
-    
-    # Step 11: App Installation Service
-    show_step 11 "App Services" "Installing application management services"
-    
-    DOCKER_HUB_NAMESPACE="ghcr.io/samtranbosch"
+
+    # Step 10: App Installation Service
+    show_step 10 "App Services" "Installing application management services"
+
     docker_pull_with_info "$DOCKER_HUB_NAMESPACE/dk_appinstallservice:latest" \
         "DreamOS application installation and lifecycle management service" \
         "GitHub Container Registry (DreamOS Project)"
     
-    # Step 12: Docker local registry (Optional)
-    show_step 12 "Docker local registry" "VIP installation"
+    # Step 11: Docker local registry (Optional)
+    show_step 11 "Docker local registry" "VIP installation"
     dk_vip_demo="false"
     echo -e "\n${YELLOW}Do you want to continue? [y/N]: ${NC}"
     read -r install_dockerlocalregistry_choice
@@ -399,8 +384,8 @@ main() {
         run_with_feedback "$CURRENT_DIR/scripts/setup_local_docker_registry.sh" "Docker local host enabled" "Docker local setup failed"
     fi
 
-    # Step 13: IVI Interface (Optional)
-    show_step 13 "IVI Interface" "Configuring In-Vehicle Infotainment system"
+    # Step 12: IVI Interface (Optional)
+    show_step 12 "IVI Interface" "Configuring In-Vehicle Infotainment system"
     
     # Check for dk_ivi parameter
     dk_ivi_value=""

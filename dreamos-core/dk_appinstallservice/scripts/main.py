@@ -370,58 +370,58 @@ def main():
         print("No .dbc files found in the package folder.")
     
 
-    print('-' * 50)
-    dbcDefaultValue_file = "/app/.dk/dk_manager/vssmapping/dbc_default_values.json"
-    # Update vssmapping overlay and supported api list
-    supported_vss_api = load_supported_vss_api(supported_vss_api_path)
-    # Check if SignalList exists in dashboardConfig
-    if 'SignalList' not in dashboard_config:
-        print("Warning: 'SignalList' not found in dashboardConfig.")
-        # return
-    # Iterate over the SignalList to modify VSS entries
-    for signal in dashboard_config['SignalList']:
-        # Extract necessary fields from the signal
-        vss_api = signal.get('vss_api')
-        if vss_api and vss_api not in supported_vss_api:
-            supported_vss_api.append(vss_api)
+    # print('-' * 50)
+    # dbcDefaultValue_file = "/app/.dk/dk_manager/vssmapping/dbc_default_values.json"
+    # # Update vssmapping overlay and supported api list
+    # supported_vss_api = load_supported_vss_api(supported_vss_api_path)
+    # # Check if SignalList exists in dashboardConfig
+    # if 'SignalList' not in dashboard_config:
+    #     print("Warning: 'SignalList' not found in dashboardConfig.")
+    #     # return
+    # # Iterate over the SignalList to modify VSS entries
+    # for signal in dashboard_config['SignalList']:
+    #     # Extract necessary fields from the signal
+    #     vss_api = signal.get('vss_api')
+    #     if vss_api and vss_api not in supported_vss_api:
+    #         supported_vss_api.append(vss_api)
 
-        vss_type = signal.get('vss_type')
-        datatype = signal.get('datatype')
-        description = signal.get('description')
-        dbc_signal = signal.get('dbc_signal')
-        vss2dbc_signal = signal.get('vss2dbc_signal')
-        dbc2vss_signal = signal.get('dbc2vss_signal')
-        interval_ms = signal.get('interval_ms')
+    #     vss_type = signal.get('vss_type')
+    #     datatype = signal.get('datatype')
+    #     description = signal.get('description')
+    #     dbc_signal = signal.get('dbc_signal')
+    #     vss2dbc_signal = signal.get('vss2dbc_signal')
+    #     dbc2vss_signal = signal.get('dbc2vss_signal')
+    #     interval_ms = signal.get('interval_ms')
         
-        # Call modify_vss_entry function
-        modify_vss_entry(
-            action='add',
-            vss_api=vss_api,
-            vss_type=vss_type,
-            datatype=datatype,
-            description=description,
-            dbc_signal=dbc_signal,
-            vss2dbc_signal=vss2dbc_signal,
-            dbc2vss_signal=dbc2vss_signal,
-            interval_ms=interval_ms
-        )
+    #     # Call modify_vss_entry function
+    #     modify_vss_entry(
+    #         action='add',
+    #         vss_api=vss_api,
+    #         vss_type=vss_type,
+    #         datatype=datatype,
+    #         description=description,
+    #         dbc_signal=dbc_signal,
+    #         vss2dbc_signal=vss2dbc_signal,
+    #         dbc2vss_signal=dbc2vss_signal,
+    #         interval_ms=interval_ms
+    #     )
 
-        # update dbc default value.
-        if dbc_file is not None and vss2dbc_signal != "":
-            # python updateDbcDefaultValue.py VCLEFT_turnSignalStatus1 Model3CAN.dbc dbc_default_values_test.json
-            cmd = f"python updateDbcDefaultValue.py {vss2dbc_signal} {dbc_file} {dbcDefaultValue_file}"
-            result = cmd_execute(cmd)
-            if result == False:
-                print(f"Error: can't update update dbc default value of {vss2dbc_signal}. cmd: {cmd}")
-                return
-            else:
-                print("Successfully update update dbc default value of {vss2dbc_signal}. cmd: {cmd}")
+    #     # update dbc default value.
+    #     if dbc_file is not None and vss2dbc_signal != "":
+    #         # python updateDbcDefaultValue.py VCLEFT_turnSignalStatus1 Model3CAN.dbc dbc_default_values_test.json
+    #         cmd = f"python updateDbcDefaultValue.py {vss2dbc_signal} {dbc_file} {dbcDefaultValue_file}"
+    #         result = cmd_execute(cmd)
+    #         if result == False:
+    #             print(f"Error: can't update update dbc default value of {vss2dbc_signal}. cmd: {cmd}")
+    #             return
+    #         else:
+    #             print("Successfully update update dbc default value of {vss2dbc_signal}. cmd: {cmd}")
 
-    # Save the updated list back to the supportedvssapi.json file
-    save_supported_vss_api(supported_vss_api_path, supported_vss_api)
-    print("Successfully update vssmapping overlay.")
+    # # Save the updated list back to the supportedvssapi.json file
+    # save_supported_vss_api(supported_vss_api_path, supported_vss_api)
+    # print("Successfully update vssmapping overlay.")
 
-    time.sleep(0.5)
+    # time.sleep(0.5)
     # print('-' * 50)
     # # restart vssgen to update new api lib
     # cmd = f"docker restart vssgen"
@@ -479,10 +479,10 @@ def main():
     print('-' * 50)
     if (DeployTarget == "vip"):
         # copy runtime folder to target
-        cmd = f"sshpass -p '{DK_VIP_PWD}' scp -o StrictHostKeyChecking=no -r {dbcDefaultValue_file} {DK_VIP_USER}@{DK_VIP_IP}:/home/.dk/dk_vss/"
-        result = cmd_execute(cmd)
-        if result == False:
-            print(f"Error: can't execute {cmd}")
+        # cmd = f"sshpass -p '{DK_VIP_PWD}' scp -o StrictHostKeyChecking=no -r {dbcDefaultValue_file} {DK_VIP_USER}@{DK_VIP_IP}:/home/.dk/dk_vss/"
+        # result = cmd_execute(cmd)
+        # if result == False:
+        #     print(f"Error: can't execute {cmd}")
 
         vss_file = "/app/.dk/dk_vssgeneration/vss.json"
         cmd = f"sshpass -p '{DK_VIP_PWD}' scp -o StrictHostKeyChecking=no -r {vss_file} {DK_VIP_USER}@{DK_VIP_IP}:/home/.dk/dk_vss/"
