@@ -311,7 +311,7 @@ main() {
     DOCKER_SHARE_PARAM="-v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker"
     DOCKER_AUDIO_PARAM="--device /dev/snd --group-add audio -e PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native -v ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native -v $HOME_DIR/.config/pulse/cookie:/root/.config/pulse/cookie"
     LOG_LIMIT_PARAM="--log-opt max-size=10m --log-opt max-file=3"
-    DOCKER_HUB_NAMESPACE="ghcr.io/samtranbosch"
+    DOCKER_HUB_NAMESPACE="ghcr.io/eclipse-autowrx"
     
     show_success "Runtime configuration completed"
     
@@ -345,14 +345,14 @@ main() {
     # Step 8: SDV Runtime
     show_step 8 "SDV Runtime" "Setting up Software Defined Vehicle runtime environment"
     
-    docker_pull_with_info "ghcr.io/eclipse-autowrx/sdv-runtime:0f74dac3bbdbe487f3e5970135c264c442ee865f" \
+    docker_pull_with_info "$DOCKER_HUB_NAMESPACE/sdv-runtime:latest" \
         "Eclipse AutoWrx SDV runtime for vehicle application management" \
         "GitHub Container Registry (Eclipse AutoWrx Project)"
     
     show_info "Configuring SDV runtime container..."
     show_info "RUNTIME_NAME: $RUNTIME_NAME"
     run_with_feedback "docker stop sdv-runtime 2>/dev/null || true; docker rm sdv-runtime 2>/dev/null || true" "Cleaned up existing SDV runtime" "Cleanup warning"
-    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=$RUNTIME_NAME --network host -e ARCH=$ARCH ghcr.io/eclipse-autowrx/sdv-runtime:0f74dac3bbdbe487f3e5970135c264c442ee865f" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
+    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=$RUNTIME_NAME --network host -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/sdv-runtime:latest" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
     
     # Step 9: DreamKit Manager
     show_step 9 "DreamKit Manager" "Installing core management services"
