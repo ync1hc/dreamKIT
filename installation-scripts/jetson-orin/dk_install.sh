@@ -352,7 +352,7 @@ main() {
     show_info "Configuring SDV runtime container..."
     show_info "RUNTIME_NAME: $RUNTIME_NAME"
     run_with_feedback "docker stop sdv-runtime 2>/dev/null || true; docker rm sdv-runtime 2>/dev/null || true" "Cleaned up existing SDV runtime" "Cleanup warning"
-    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=\"$RUNTIME_NAME\" --network host -e ARCH=$ARCH ghcr.io/eclipse-autowrx/sdv-runtime:0f74dac3bbdbe487f3e5970135c264c442ee865f" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
+    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=$RUNTIME_NAME --network host -e ARCH=$ARCH ghcr.io/eclipse-autowrx/sdv-runtime:0f74dac3bbdbe487f3e5970135c264c442ee865f" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
     
     # Step 9: DreamKit Manager
     show_step 9 "DreamKit Manager" "Installing core management services"
