@@ -598,6 +598,8 @@ Rectangle {
                                                 case 2: return "◆"  // App Test Deployment - diamond
                                                 case 3: return "▲"  // Vehicle App - triangle
                                                 case 4: return "■"  // Vehicle Service - square
+                                                case 5: return "⬟"  // Protocol Bridge - pentagon
+                                                case 6: return "◈"  // USS Sensors - special diamond
                                                 default: return "●"
                                             }
                                         }
@@ -742,6 +744,8 @@ Rectangle {
                     Loader { source: "../digitalauto/digitalauto.qml" }
                     Loader { source: "../installedvapps/installedvapps.qml" }
                     Loader { source: "../installedservices/installedservices.qml" }
+                    Loader { source: "../protocolbridge/protocolbridge.qml" }
+                    Loader { source: "../uss/uss.qml" }
                 }
             }
         }
@@ -754,5 +758,7 @@ Rectangle {
         ListElement { title: "App Test Deployment" }
         ListElement { title: "Vehicle App" }
         ListElement { title: "Vehicle Service" }
+        ListElement { title: "Protocol Bridge" }
+        ListElement { title: "USS Sensors" }
     }
 }
