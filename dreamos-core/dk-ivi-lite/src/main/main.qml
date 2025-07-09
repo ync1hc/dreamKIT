@@ -191,7 +191,7 @@ ApplicationWindow {
 
         Text {
             anchors.centerIn: parent
-            text: "© 2025 - MS/ETA - BGSV"
+            text: "© 2025 - MS/EDA - BGSV"
             font.family: "Segoe UI"
             font.pixelSize: 16
             font.weight: Font.Bold

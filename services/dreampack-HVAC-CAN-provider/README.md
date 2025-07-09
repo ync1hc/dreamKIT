@@ -94,7 +94,7 @@ docker build -t dk_service_can_provider:latest --file Dockerfile .
 # 
 # Run the docker
 docker stop dk_service_can_provider; docker rm dk_service_can_provider
-docker run -d -it --name dk_service_can_provider --net=host -e LOG_LEVEL=INFO -e CAN_PORT=vcan0 dk_service_can_provider
+docker run -d -it --name dk_service_can_provider --net=host -e LOG_LEVEL=INFO -e CAN_PORT=vcan0 -e KUKSA_ADDRESS=localhost dk_service_can_provider
 ```
 
 Debug
@@ -166,7 +166,7 @@ docker buildx build --platform linux/arm64 -t dk_service_can_provider:arm64 --lo
 ### Deploy and run
 ```shell
 # Interact with Orin - Update the Docker Local registry
-docker tag dk_service_can_provider:arm64 192.168.56.48:5000/dk_service_can_provider:arm64
+docker tag dk_service_can_provider:latest 192.168.56.48:5000/dk_service_can_provider:arm64
 docker push 192.168.56.48:5000/dk_service_can_provider:arm64
 
 # Interact with S32G - pull the docker images from local host at Orin
@@ -191,6 +191,76 @@ cansend can1 3E9#0000000000000000
 cansend can1 3E9#0100000000000000
 ```
 
+# Sonar Parking
+
+## Deployment
+```shell
+# Jetson Orin/ Ubuntu Machine
+docker save -o dk_service_can_provider.tar dk_service_can_provider:latest
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'mkdir -p /home/root/.dk/nxp-s32g/docker/'
+scp dk_service_can_provider.tar root@192.168.56.49:/home/root/.dk/nxp-s32g/docker/dk_service_can_provider.tar
+
+# Option 1: with SSH
+ssh root@192.168.56.49
+cd /home/root/.dk/nxp-s32g/docker/
+docker load -i dk_service_can_provider:latest
+docker kill dk_service_can_provider;docker rm dk_service_can_provider
+docker run -d -it --name dk_service_can_provider --restart unless-stopped --log-opt max-size=10m --log-opt max-file=3 --network host -e CAN_PORT=can0 --privileged dk_service_can_provider:latest
 
 
+# Option 2: If you don't want to have the ssh than replacing 'docker ps' by your command
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker load -i /home/root/.dk/nxp-s32g/docker/dk_service_can_provider.tar'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker kill dk_service_can_provider;docker rm dk_service_can_provider'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker run -d -it --name dk_service_can_provider --restart unless-stopped --log-opt max-size=10m --log-opt max-file=3 --network host -e CAN_PORT=can0 --privileged dk_service_can_provider:latest'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker ps'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker logs dk_service_can_provider'
+```
+
+## Testing
+### Via CAN -> Kuksa Client
+
+```shell
+# 
+# Kuksa Client
+#
+# Testing with executing the kuksa-client python version
+kuksa-client grpc://127.0.0.1:55555
+# or
+kuksa-client grpc://192.168.56.48:55555
+
+# Subsribe
+subscribe Vehicle.ADAS.ObstacleDetectionFront.Left.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionFront.CornerLeft.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionFront.Center.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionFront.CenterRight.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionFront.CornerRight.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionFront.Right.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionRear.Right.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionRear.CornerRight.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionRear.CenterRight.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionRear.Center.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionRear.CornerLeft.Distance
+subscribe Vehicle.ADAS.ObstacleDetectionRear.Left.Distance
+```
+
+```shell
+# Then obervation on the update whener send message on CAN bus
+cansend vcan0 331#000007d200188002
+```
+
+### Via Kuksa Client -> IVI
+
+```shell
+#
+# Testing with executing the kuksa-client python version
+kuksa-client grpc://127.0.0.1:55555
+# or
+kuksa-client grpc://192.168.56.48:55555
+
+# Report current status from Sensor
+setValue Vehicle.ADAS.ObstacleDetectionFront.Left.Distance {}
+
+# 
+# Observation on IVI for the update
+```
 

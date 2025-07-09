@@ -345,14 +345,14 @@ main() {
     # Step 8: SDV Runtime
     show_step 8 "SDV Runtime" "Setting up Software Defined Vehicle runtime environment"
     
-    docker_pull_with_info "$DOCKER_HUB_NAMESPACE/sdv-runtime:latest" \
+    docker_pull_with_info "$DOCKER_HUB_NAMESPACE/sdv-runtime:6d277966d78c2510a6934fb342277103751feb79" \
         "Eclipse AutoWrx SDV runtime for vehicle application management" \
         "GitHub Container Registry (Eclipse AutoWrx Project)"
     
     show_info "Configuring SDV runtime container..."
     show_info "RUNTIME_NAME: $RUNTIME_NAME"
     run_with_feedback "docker stop sdv-runtime 2>/dev/null || true; docker rm sdv-runtime 2>/dev/null || true" "Cleaned up existing SDV runtime" "Cleanup warning"
-    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=$RUNTIME_NAME --network host -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/sdv-runtime:latest" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
+    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=$RUNTIME_NAME --network host -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/sdv-runtime:6d277966d78c2510a6934fb342277103751feb79" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
     
     # Step 9: DreamKit Manager
     show_step 9 "DreamKit Manager" "Installing core management services"
@@ -395,6 +395,8 @@ main() {
         fi
     done
     
+    DOCKER_HUB_NAMESPACE="ghcr.io/samtranbosch"
+
     if [[ "$dk_ivi_value" == "true" ]]; then
         show_info "Installing IVI interface..."
         run_with_feedback "$CURRENT_DIR/scripts/dk_enable_xhost.sh" "X11 forwarding enabled" "X11 setup failed"
@@ -417,7 +419,7 @@ main() {
         
         if [[ "$install_ivi_choice" =~ ^[Yy]$ ]]; then
             echo -e "\n${GREEN}Installing IVI interface...${NC}"
-            run_with_feedback "$CURRENT_DIR/scripts/dk_enable_xhost.sh" "X11 forwarding enabled" "X11 setup failed"
+            # run_with_feedback "$CURRENT_DIR/scripts/dk_enable_xhost.sh" "X11 forwarding enabled" "X11 setup failed"
             run_with_feedback "docker pull $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI image downloaded" "Failed to download IVI"
             run_with_feedback "xhost +local:docker" "Docker X11 access granted" "X11 access failed"
             
@@ -434,6 +436,8 @@ main() {
             show_info "IVI installation skipped (you can install later with './dk_install dk_ivi=true')"
         fi
     fi
+    
+    DOCKER_HUB_NAMESPACE="ghcr.io/eclipse-autowrx"
     
     # Final steps
     separator

@@ -1,5 +1,18 @@
 {
 
+  "Dst_S01_PSM_01" : 2002,
+  "Dst_S02_PSM_01" : 2002,
+  "Dst_S03_PSM_02" : 2002,
+  "Dst_S04_PSM_02" : 2002,
+  "Dst_S05_PSM_03" : 2002,
+  "Dst_S06_PSM_03" : 2002,
+  "Dst_S07_PSM_04" : 2002,
+  "Dst_S08_PSM_04" : 2002,
+  "Dst_S09_PSM_05" : 2002,
+  "Dst_S10_PSM_05" : 2002,
+  "Dst_S11_PSM_06" : 2002,
+  "Dst_S12_PSM_06" : 2002,
+  
   "VCRIGHT_conditioningRequest" : 0,
   "VCRIGHT_evapPerformanceLow" : 0,
   "VCRIGHT_hvacBlowerSpeedRPMReq" : 0,
