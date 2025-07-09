@@ -89,6 +89,7 @@ spinner() {
     printf "\r"
 }
 
+
 # Function to show step header
 show_step() {
     local step_num=$1
