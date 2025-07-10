@@ -395,7 +395,7 @@ main() {
         fi
     done
     
-    DOCKER_HUB_NAMESPACE="ghcr.io/ync1hc"
+    DOCKER_HUB_NAMESPACE="ghcr.io/samtranbosch"
 
     if [[ "$dk_ivi_value" == "true" ]]; then
         show_info "Installing IVI interface..."
