@@ -32,106 +32,106 @@ Vehicle.ADAS.ObstacleDetectionFront.Left.Distance:
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S01_PSM_01
+    signal: Dst_S01_01
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionFront.CornerLeft.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S02_PSM_01
+    signal: Dst_S02_01
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionFront.Center.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S03_PSM_02
+    signal: Dst_S03_02
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionFront.CenterRight.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S04_PSM_02
+    signal: Dst_S04_02
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionFront.CornerRight.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S05_PSM_03
+    signal: Dst_S05_03
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionFront.Right.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S06_PSM_03
+    signal: Dst_S06_03
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionRear.Right.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S07_PSM_04
+    signal: Dst_S07_04
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionRear.CornerRight.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S08_PSM_04
+    signal: Dst_S08_04
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionRear.CenterRight.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S09_PSM_05
+    signal: Dst_S09_05
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionRear.Center.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S10_PSM_05
+    signal: Dst_S10_05
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionRear.CornerLeft.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S11_PSM_06
+    signal: Dst_S11_06
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
 Vehicle.ADAS.ObstacleDetectionRear.Left.Distance:
   type: sensor
   datatype: float
   dbc2vss:
     interval_ms: 50
-    signal: Dst_S12_PSM_06
+    signal: Dst_S12_06
     transform:
-      math: "(x/100)"
+      math: "(x)"
 
