@@ -279,7 +279,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S01_PSM_01"
+                      "signal": "Dst_S01_01"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -295,7 +295,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S02_PSM_01"
+                      "signal": "Dst_S02_01"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -311,7 +311,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S03_PSM_02"
+                      "signal": "Dst_S03_02"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -327,7 +327,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S04_PSM_02"
+                      "signal": "Dst_S04_02"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -343,7 +343,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S05_PSM_03"
+                      "signal": "Dst_S05_03"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -359,7 +359,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S06_PSM_03"
+                      "signal": "Dst_S06_03"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -381,7 +381,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S07_PSM_04"
+                      "signal": "Dst_S07_04"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -397,7 +397,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S08_PSM_04"
+                      "signal": "Dst_S08_04"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -413,7 +413,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S09_PSM_05"
+                      "signal": "Dst_S09_05"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -429,7 +429,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S10_PSM_05"
+                      "signal": "Dst_S10_05"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -445,7 +445,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S11_PSM_06"
+                      "signal": "Dst_S11_06"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
@@ -461,7 +461,7 @@
                     "dbc2vss": {
                       "interval_ms": 250,
                       "on_change": false,
-                      "signal": "Dst_S12_PSM_06"
+                      "signal": "Dst_S12_06"
                     },
                     "description": "Indicates distance of sonar sensor",
                     "type": "sensor"
