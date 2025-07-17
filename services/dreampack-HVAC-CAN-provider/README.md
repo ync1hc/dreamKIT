@@ -15,9 +15,14 @@
     - [Network Setup (Ubuntu VM \<-\> Jetson Orin \<-\> S32G)](#network-setup-ubuntu-vm---jetson-orin---s32g)
     - [Local - Build and Test](#local---build-and-test)
   - [S32G - Build and Test](#s32g---build-and-test)
-    - [Prepare the docker image (arm46)](#prepare-the-docker-image-arm46)
+    - [Prepare the docker image (arm64)](#prepare-the-docker-image-arm64)
     - [Deploy and run](#deploy-and-run)
     - [Check CAN Bus](#check-can-bus)
+- [Sonar Parking](#sonar-parking)
+  - [Deployment](#deployment)
+  - [Testing](#testing)
+    - [Via CAN -\> Kuksa Client](#via-can---kuksa-client)
+    - [Via Kuksa Client -\> IVI](#via-kuksa-client---ivi)
 
 
 
@@ -94,7 +99,7 @@ docker build -t dk_service_can_provider:latest --file Dockerfile .
 # 
 # Run the docker
 docker stop dk_service_can_provider; docker rm dk_service_can_provider
-docker run -d -it --name dk_service_can_provider --net=host -e LOG_LEVEL=INFO -e CAN_PORT=vcan0 -e KUKSA_ADDRESS=localhost dk_service_can_provider
+docker run -d -it --name dk_service_can_provider --net=host -e LOG_LEVEL=INFO -e CAN_PORT=can0 -e KUKSA_ADDRESS=192.168.56.48 dk_service_can_provider
 ```
 
 Debug
