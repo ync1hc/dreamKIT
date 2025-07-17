@@ -45,10 +45,13 @@ Q_SIGNALS:
     // Aggregated status
     void updateClosestObstacle(const QString& location, float distance);
     void updateParkingMode(bool active);
+    void updateWarningStatus(bool showWarning);
+    void updateProximityDetected(float detected);
 
 private:
     void updateClosestDistance();
     void simulateParkingScenario();
+    void evaluateWarningStatus();
     
     struct SensorData {
         std::string vssPath;
@@ -59,6 +62,7 @@ private:
     std::array<SensorData, 12> m_sensors;
     bool m_parkingModeActive;
     bool m_scenarioRunning;
+    float m_proximityDetected;
     
     // Helper method to get sensor index from VSS path
     int getSensorIndexFromPath(const std::string& path);

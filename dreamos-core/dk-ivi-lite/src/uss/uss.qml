@@ -12,6 +12,8 @@ Rectangle {
     property bool guiTestMode: false
     property var sensorDistances: [10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0]
     property int testCycleStep: 0
+    property real proximityDetected: -1.0
+    property bool showWarningIcon: false
     
     // GUI Test Animation Timer
     Timer {
@@ -167,6 +169,16 @@ Rectangle {
                 closestObstacleText.text = location + ": " + distance.toFixed(2) + "m"
             }
         }
+        
+        onUpdateProximityDetected: (detected) => {
+            if (!guiTestMode) {
+                proximityDetected = detected
+            }
+        }
+        
+        onUpdateWarningStatus: (showWarning) => {
+            showWarningIcon = showWarning
+        }
     }
     
     Component.onCompleted: {
@@ -319,8 +331,9 @@ Rectangle {
         // Main visualization container
         Item {
             id: visualizationContainer
-            width: Math.min(parent.width, 1000)
+            width: parent.width - 220 - 20 - 220 - 20 - 24*2 // parent.width - leftPanel.width - spacing - rightPanel.width - spacing - margins
             height: 600
+            x: 220 + 20 + 24 // leftPanel.width + spacing + margin
             y: 80
             anchors.horizontalCenter: parent.horizontalCenter
             
@@ -981,6 +994,128 @@ Rectangle {
                                     font.family: "Segoe UI"
                                     font.weight: Font.Medium
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Right panel - Theft Detection
+            Rectangle {
+                id: rightPanel
+                width: 220
+                height: 200 // Adjusted height
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.rightMargin: 24
+                anchors.topMargin: 50
+                color: "#1A1A1A"
+                radius: 16
+                border.color: "#2A2A2A"
+                border.width: 1
+
+                Column {
+                    width: parent.width - 30
+                    spacing: 12
+                    anchors.fill: parent
+                    anchors.margins: 15
+
+                    Text {
+                        text: "Theft Detection"
+                        font.pixelSize: 18
+                        font.family: "Segoe UI"
+                        font.weight: Font.Bold // Make text bold
+                        color: "#00D4AA"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: "#2A2A2A"
+                    }
+
+                    Row {
+                        spacing: 10
+                        Text {
+                            text: "Key Proximity:"
+                            color: "#00D4AA"
+                            font.pixelSize: 12 // Increased font size
+                            font.family: "Segoe UI"
+                        }
+                        Text {
+                            text: (proximityDetected >= 0 && proximityDetected <= 1000) ? proximityDetected.toFixed(2) + "m" : "Not Detected"
+                            color: (proximityDetected < 0 || proximityDetected > 1000 || proximityDetected >= 3.0) ? "#FF0000" : "#00FF00"
+                            font.pixelSize: 12 // Increased font size
+                            font.family: "Segoe UI"
+                            font.weight: Font.Medium
+                        }
+                    }
+
+                    // Warning/Safe Icons
+                    Rectangle {
+                        id: warningIcon
+                        width: 64 // Increased icon size
+                        height: 64 // Increased icon size
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: showWarningIcon
+                        color: "transparent"
+
+                        Canvas {
+                            anchors.fill: parent
+                            onPaint: {
+                                var ctx = getContext("2d");
+                                ctx.clearRect(0, 0, width, height);
+
+                                // Draw red triangle
+                                ctx.beginPath();
+                                ctx.moveTo(width / 2, 0);
+                                ctx.lineTo(width, height);
+                                ctx.lineTo(0, height);
+                                ctx.closePath();
+                                ctx.fillStyle = "red";
+                                ctx.fill();
+
+                                // Draw exclamation mark
+                                ctx.font = "bold 40px Arial"; // Increased font size
+                                ctx.fillStyle = "white";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText("!", width / 2, height * 0.6);
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        id: safeIcon
+                        width: 64 // Increased icon size
+                        height: 64 // Increased icon size
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: !showWarningIcon
+                        color: "transparent"
+
+                        Canvas {
+                            anchors.fill: parent
+                            onPaint: {
+                                var ctx = getContext("2d");
+                                ctx.clearRect(0, 0, width, height);
+
+                                // Draw green circle
+                                ctx.beginPath();
+                                ctx.arc(width / 2, height / 2, width / 2, 0, 2 * Math.PI);
+                                ctx.fillStyle = "green";
+                                ctx.fill();
+
+                                // Draw checkmark (simple V shape)
+                                ctx.strokeStyle = "white";
+                                ctx.lineWidth = 7; // Increased line width
+                                ctx.lineCap = "round";
+                                ctx.lineJoin = "round";
+                                ctx.beginPath();
+                                ctx.moveTo(width * 0.25, height * 0.5);
+                                ctx.lineTo(width * 0.45, height * 0.7);
+                                ctx.lineTo(width * 0.75, height * 0.3);
+                                ctx.stroke();
                             }
                         }
                     }

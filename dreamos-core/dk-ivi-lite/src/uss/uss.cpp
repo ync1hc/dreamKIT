@@ -6,7 +6,7 @@
 #include <cmath>
 #include "library/vapiclient/vapiclient.hpp"
 
-UssAsync::UssAsync() : m_parkingModeActive(false), m_scenarioRunning(false)
+UssAsync::UssAsync() : m_parkingModeActive(false), m_scenarioRunning(false), m_proximityDetected(false)
 {
     qDebug() << __func__ << " - " << __LINE__ << " USS System initializing ===============================";
 
@@ -31,6 +31,10 @@ UssAsync::UssAsync() : m_parkingModeActive(false), m_scenarioRunning(false)
         signalPaths.push_back(sensor.vssPath);
         qDebug() << "USS: Subscribing to path:" << QString::fromStdString(sensor.vssPath);
     }
+    
+    // Add proximity sensor subscription
+    signalPaths.push_back(VehicleAPI::V_Driver_ProximityDetected);
+    qDebug() << "USS: Subscribing to path:" << QString::fromStdString(VehicleAPI::V_Driver_ProximityDetected);
     
     qDebug() << "USS: Total paths to subscribe:" << signalPaths.size();
     
@@ -84,7 +88,20 @@ void UssAsync::init()
         }
     }
     
+    // Initialize proximity sensor value
+    VAPI_CLIENT.getCurrentValue(DK_VAPI_DATABROKER, VehicleAPI::V_Driver_ProximityDetected, val);
+    qDebug() << "USS: Reading proximity sensor path:" << QString::fromStdString(VehicleAPI::V_Driver_ProximityDetected)
+             << "value:" << QString::fromStdString(val);
+    try {
+        m_proximityDetected = std::stof(val);
+    } catch (const std::exception& e) {
+        qDebug() << "Error converting initial proximity value:" << QString::fromStdString(val);
+        m_proximityDetected = -1.0f; // Indicate error or unknown state
+    }
+    emit updateProximityDetected(m_proximityDetected);
+    
     updateClosestDistance();
+    evaluateWarningStatus();
     qDebug() << "USS: init() completed";
     
     // Temporary polling timer as workaround for subscription issue
@@ -120,7 +137,23 @@ void UssAsync::init()
                 // Ignore conversion errors in polling
             }
         }
+        
+        // Poll proximity sensor
+        VAPI_CLIENT.getCurrentValue(DK_VAPI_DATABROKER, VehicleAPI::V_Driver_ProximityDetected, val);
+        float detectedDistance = -1.0f;
+        try {
+            detectedDistance = std::stof(val);
+        } catch (const std::exception& e) {
+            qDebug() << "Error converting polled proximity value:" << QString::fromStdString(val);
+        }
+        if (std::abs(detectedDistance - m_proximityDetected) > 0.01f) {
+            qDebug() << "USS: Polling detected change for proximity sensor:" << m_proximityDetected << "->" << detectedDistance;
+            m_proximityDetected = detectedDistance;
+            emit updateProximityDetected(m_proximityDetected);
+        }
+        
         updateClosestDistance();
+        evaluateWarningStatus();
     });
     pollTimer->start(500); // Poll every 500ms
     qDebug() << "USS: Started polling timer as workaround for all sensors";
@@ -130,6 +163,22 @@ void UssAsync::vssSubscribeCallback(const std::string &updatePath, const std::st
 {
     qDebug() << "USS subscription callback - Path:" << QString::fromStdString(updatePath) 
              << "Value:" << QString::fromStdString(updateValue);
+    
+    if (updatePath == VehicleAPI::V_Driver_ProximityDetected) {
+        float detectedDistance = -1.0f;
+        try {
+            detectedDistance = std::stof(updateValue);
+        } catch (const std::exception& e) {
+            qDebug() << "Error converting subscribed proximity value:" << QString::fromStdString(updateValue);
+        }
+        if (std::abs(detectedDistance - m_proximityDetected) > 0.01f) {
+            m_proximityDetected = detectedDistance;
+            emit updateProximityDetected(m_proximityDetected);
+            qDebug() << "USS: Proximity status updated to" << m_proximityDetected;
+        }
+        evaluateWarningStatus();
+        return;
+    }
     
     int sensorIndex = getSensorIndexFromPath(updatePath);
     if (sensorIndex < 0) {
@@ -158,6 +207,7 @@ void UssAsync::vssSubscribeCallback(const std::string &updatePath, const std::st
         }
         
         updateClosestDistance();
+        evaluateWarningStatus();
         
         // Check for parking mode activation
         if (!m_parkingModeActive && distance < 2.5f) {
@@ -237,6 +287,8 @@ void UssAsync::qml_stopScenario()
     qml_setAllTestDistances(10.0f); // Reset all to max distance
 }
 
+
+
 void UssAsync::updateClosestDistance()
 {
     float closestFront = 10.0f;
@@ -267,6 +319,52 @@ void UssAsync::updateClosestDistance()
     } else {
         emit updateClosestObstacle("Clear", 10.0f);
     }
+}
+
+void UssAsync::evaluateWarningStatus()
+{
+    bool showWarning = false;
+
+    // Define "Not Detected" for proximity as < 0 or > 1000
+    bool proximityNotDetected = (m_proximityDetected < 0 || m_proximityDetected > 1000.0f);
+
+    // Check for any obstacle distance <= 0.3
+    bool anyObstacleClose = false;
+    for (const auto& sensor : m_sensors) {
+        if (sensor.currentDistance <= 0.3f) {
+            anyObstacleClose = true;
+            break;
+        }
+    }
+
+    // Condition for Red Warning Icon:
+    // If (Vehicle.Driver.ProximityDetected >= 3.0 OR Vehicle.Driver.ProximityDetected "Not Detected")
+    // AND any of the Vehicle.ADAS.ObstacleDetection distances are <= 0.3.
+    if ((m_proximityDetected >= 3.0f || proximityNotDetected) && anyObstacleClose) {
+        showWarning = true;
+    }
+
+    // Condition for Green Safe Icon:
+    // If (Vehicle.Driver.ProximityDetected < 3.0 AND Vehicle.Driver.ProximityDetected different "Not Detected")
+    // OR all of the Vehicle.ADAS.ObstacleDetection distances are > 0.3.
+    // This condition is evaluated only if the red warning condition is NOT met.
+    if (!showWarning) {
+        bool allObstaclesFar = true;
+        for (const auto& sensor : m_sensors) {
+            if (sensor.currentDistance <= 0.3f) { // If any obstacle is close, then not all are far
+                allObstaclesFar = false;
+                break;
+            }
+        }
+
+        if ((m_proximityDetected < 3.0f && !proximityNotDetected) || allObstaclesFar) {
+            showWarning = false; // Show green safe icon
+        } else {
+            showWarning = true; // Otherwise, it's a warning state
+        }
+    }
+
+    emit updateWarningStatus(showWarning);
 }
 
 void UssAsync::simulateParkingScenario()

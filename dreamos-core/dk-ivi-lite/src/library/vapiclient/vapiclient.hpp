@@ -78,6 +78,8 @@ namespace VehicleAPI {
     inline constexpr const char* V_ADAS_ObstacleDetectionRear_CornerLeft_Distance   = "Vehicle.ADAS.ObstacleDetectionRear.CornerLeft.Distance";
     inline constexpr const char* V_ADAS_ObstacleDetectionRear_Left_Distance         = "Vehicle.ADAS.ObstacleDetectionRear.Left.Distance";
 
+    inline constexpr const char* V_Driver_ProximityDetected = "Vehicle.Driver.ProximityDetected";
+
     // Enum for Vehicle.SwUpdate.Status
     enum SwUpdateStatus {
         V_U_Status_Idle = 0,
