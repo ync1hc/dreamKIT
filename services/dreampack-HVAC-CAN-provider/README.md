@@ -198,11 +198,10 @@ cansend can1 3E9#0100000000000000
 
 # Sonar Parking
 
-## Deployment
+## Deployment - local dev
 ```shell
 # Jetson Orin/ Ubuntu Machine
-docker pull ghcr.io/ync1hc/dk_service_can_provider:latest
-docker save -o dk_service_can_provider.tar ghcr.io/ync1hc/dk_service_can_provider:latest
+docker save -o dk_service_can_provider.tar dk_service_can_provider:latest
 sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'mkdir -p /home/root/.dk/nxp-s32g/docker/'
 scp dk_service_can_provider.tar root@192.168.56.49:/home/root/.dk/nxp-s32g/docker/dk_service_can_provider.tar
 
@@ -215,6 +214,26 @@ docker run -d -it --name dk_service_can_provider --restart unless-stopped --log-
 
 
 # Option 2: If you don't want to have the ssh than replacing 'docker ps' by your command
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker kill dk_service_can_provider;docker rm dk_service_can_provider'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker images'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker rmi -f dk_service_can_provider'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker rmi -f ghcr.io/ync1hc/dk_service_can_provider:latest'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker load -i /home/root/.dk/nxp-s32g/docker/dk_service_can_provider.tar'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker run -d -it --name dk_service_can_provider --restart unless-stopped --log-opt max-size=10m --log-opt max-file=3 --network host -e CAN_PORT=can0 -e KUKSA_ADDRESS=192.168.56.48 --privileged dk_service_can_provider:latest'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker ps'
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker logs dk_service_can_provider'
+```
+
+## Deployment - ghcr.io
+```shell
+# Jetson Orin/ Ubuntu Machine
+docker pull ghcr.io/ync1hc/dk_service_can_provider:latest
+docker save -o dk_service_can_provider.tar ghcr.io/ync1hc/dk_service_can_provider:latest
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'mkdir -p /home/root/.dk/nxp-s32g/docker/'
+scp dk_service_can_provider.tar root@192.168.56.49:/home/root/.dk/nxp-s32g/docker/dk_service_can_provider.tar
+
+# Option 2: If you don't want to have the ssh than replacing 'docker ps' by your command
+sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker rmi -f ghcr.io/ync1hc/dk_service_can_provider'
 sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker load -i /home/root/.dk/nxp-s32g/docker/dk_service_can_provider.tar'
 sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker kill dk_service_can_provider;docker rm dk_service_can_provider'
 sshpass -p '' ssh -o StrictHostKeyChecking=no root@192.168.56.49 'docker run -d -it --name dk_service_can_provider --restart unless-stopped --log-opt max-size=10m --log-opt max-file=3 --network host -e CAN_PORT=can0 -e KUKSA_ADDRESS=192.168.56.48 --privileged ghcr.io/ync1hc/dk_service_can_provider:latest'
