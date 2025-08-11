@@ -757,7 +757,7 @@ Rectangle {
                     anchors.margins: 15
                     
                     Column {
-                        width: parent.width - 30
+                        width: parent.width
                         spacing: 12
                         
                         Text {

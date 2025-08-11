@@ -2,7 +2,7 @@
 
 echo "Start dk_ivi"
 # start local mqtt server
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/exec/lib:/app/exec/lib/qt6/lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/exec/lib:/app/exec/lib/qt6/lib/:/app/exec/library
 export QML2_IMPORT_PATH=/app/exec/lib/qt6/qml
 export QT_PLUGIN_PATH=/app/exec/lib/qt6/plugins/
 #export QT_QUICK_BACKEND=software

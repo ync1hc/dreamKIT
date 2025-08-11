@@ -61,7 +61,6 @@ COPY ./src/library/target/${TARGETARCH} /app/exec/library
 
 RUN chmod +x /app/start.sh
 
-ENV LD_LIBRARY_PATH=/app/exec/library
 ENV QML_IMPORT_PATH=/usr/lib/x86_64-linux-gnu/qt6/qml
 
 CMD ["/app/start.sh"]

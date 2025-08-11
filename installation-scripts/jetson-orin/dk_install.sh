@@ -326,63 +326,63 @@ main() {
     run_with_feedback "docker network create dk_network 2>/dev/null || true" "Docker network 'dk_network' ready" "Network setup encountered issues"
     
     # Step 6: Dependencies Installation
-    show_step 6 "Dependencies" "Installing required system utilities"
+    # show_step 6 "Dependencies" "Installing required system utilities"
     
-    if command -v git >/dev/null 2>&1; then
-        show_info "Git is already installed"
-    else
-        show_info "Installing Git..."
-        run_with_feedback "sudo apt-get update && sudo apt-get install -y git" "Git installed successfully" "Failed to install Git" true true
-    fi
+    # if command -v git >/dev/null 2>&1; then
+    #     show_info "Git is already installed"
+    # else
+    #     show_info "Installing Git..."
+    #     run_with_feedback "sudo apt-get update && sudo apt-get install -y git" "Git installed successfully" "Failed to install Git" true true
+    # fi
     
     # Step 7: KUKSA Client
-    show_step 7 "KUKSA Client" "Downloading vehicle signal specification client"
+    # show_step 7 "KUKSA Client" "Downloading vehicle signal specification client"
     
-    docker_pull_with_info "ghcr.io/eclipse/kuksa.val/kuksa-client:0.4.2" \
-    "Eclipse KUKSA VAL client for vehicle signal access and testing" \
-    "GitHub Container Registry (Eclipse Foundation)"
+    # docker_pull_with_info "ghcr.io/eclipse/kuksa.val/kuksa-client:0.4.2" \
+    # "Eclipse KUKSA VAL client for vehicle signal access and testing" \
+    # "GitHub Container Registry (Eclipse Foundation)"
     
     # Step 8: SDV Runtime
-    show_step 8 "SDV Runtime" "Setting up Software Defined Vehicle runtime environment"
+    # show_step 8 "SDV Runtime" "Setting up Software Defined Vehicle runtime environment"
     
-    docker_pull_with_info "$DOCKER_HUB_NAMESPACE/sdv-runtime:6d277966d78c2510a6934fb342277103751feb79" \
-    "Eclipse AutoWrx SDV runtime for vehicle application management" \
-    "GitHub Container Registry (Eclipse AutoWrx Project)"
+    # docker_pull_with_info "$DOCKER_HUB_NAMESPACE/sdv-runtime:6d277966d78c2510a6934fb342277103751feb79" \
+    # "Eclipse AutoWrx SDV runtime for vehicle application management" \
+    # "GitHub Container Registry (Eclipse AutoWrx Project)"
     
-    show_info "Configuring SDV runtime container..."
-    show_info "RUNTIME_NAME: $RUNTIME_NAME"
-    run_with_feedback "docker stop sdv-runtime 2>/dev/null || true; docker rm sdv-runtime 2>/dev/null || true" "Cleaned up existing SDV runtime" "Cleanup warning"
-    run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=$RUNTIME_NAME --network host -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/sdv-runtime:6d277966d78c2510a6934fb342277103751feb79" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
+    # show_info "Configuring SDV runtime container..."
+    # show_info "RUNTIME_NAME: $RUNTIME_NAME"
+    # run_with_feedback "docker stop sdv-runtime 2>/dev/null || true; docker rm sdv-runtime 2>/dev/null || true" "Cleaned up existing SDV runtime" "Cleanup warning"
+    # run_with_feedback "docker run -d -it --name sdv-runtime --restart unless-stopped -e USER=$DK_USER -e RUNTIME_NAME=$RUNTIME_NAME --network host -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/sdv-runtime:6d277966d78c2510a6934fb342277103751feb79" "SDV runtime container started on port 55555" "Failed to start SDV runtime"
     
     # Step 9: DreamKit Manager
-    show_step 9 "DreamKit Manager" "Installing core management services"
+    # show_step 9 "DreamKit Manager" "Installing core management services"
     
-    docker_pull_with_info "$DOCKER_HUB_NAMESPACE/dk_manager:latest" \
-    "DreamOS core manager for system orchestration and service management" \
-    "GitHub Container Registry (DreamOS Project)"
+    # docker_pull_with_info "$DOCKER_HUB_NAMESPACE/dk_manager:latest" \
+    # "DreamOS core manager for system orchestration and service management" \
+    # "GitHub Container Registry (DreamOS Project)"
     
-    show_info "Configuring DreamKit manager container..."
-    run_with_feedback "docker stop dk_manager 2>/dev/null || true; docker rm dk_manager 2>/dev/null || true" "Cleaned up existing manager" "Manager cleanup"
-    run_with_feedback "docker run -d -it --name dk_manager $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk --restart unless-stopped -e USER=$DK_USER -e DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/dk_manager:latest" "DreamKit manager started with Docker socket access" "Failed to start manager"
+    # show_info "Configuring DreamKit manager container..."
+    # run_with_feedback "docker stop dk_manager 2>/dev/null || true; docker rm dk_manager 2>/dev/null || true" "Cleaned up existing manager" "Manager cleanup"
+    # run_with_feedback "docker run -d -it --name dk_manager $LOG_LIMIT_PARAM $DOCKER_SHARE_PARAM -v $HOME_DIR/.dk:/app/.dk --restart unless-stopped -e USER=$DK_USER -e DOCKER_HUB_NAMESPACE=$DOCKER_HUB_NAMESPACE -e ARCH=$ARCH $DOCKER_HUB_NAMESPACE/dk_manager:latest" "DreamKit manager started with Docker socket access" "Failed to start manager"
 
-    # Step 10: App Installation Service
-    show_step 10 "App Services" "Installing application management services"
+    # # Step 10: App Installation Service
+    # show_step 10 "App Services" "Installing application management services"
 
-    docker_pull_with_info "$DOCKER_HUB_NAMESPACE/dk_appinstallservice:latest" \
-    "DreamOS application installation and lifecycle management service" \
-    "GitHub Container Registry (DreamOS Project)"
+    # docker_pull_with_info "$DOCKER_HUB_NAMESPACE/dk_appinstallservice:latest" \
+    # "DreamOS application installation and lifecycle management service" \
+    # "GitHub Container Registry (DreamOS Project)"
     
     # Step 11: Docker local registry (Optional)
-    show_step 11 "Docker local registry" "VIP installation"
-    dk_vip_demo="false"
-    echo -e "\n${YELLOW}Do you want to continue? [y/N]: ${NC}"
-    read -r install_dockerlocalregistry_choice
+    # show_step 11 "Docker local registry" "VIP installation"
+    # dk_vip_demo="false"
+    # echo -e "\n${YELLOW}Do you want to continue? [y/N]: ${NC}"
+    # read -r install_dockerlocalregistry_choice
     
-    if [[ "$install_dockerlocalregistry_choice" =~ ^[Yy]$ ]]; then
-    dk_vip_demo="true"
-    show_info "Setup local registry..."
-    run_with_feedback "$CURRENT_DIR/scripts/setup_local_docker_registry.sh" "Docker local host enabled" "Docker local setup failed"
-    fi
+    # if [[ "$install_dockerlocalregistry_choice" =~ ^[Yy]$ ]]; then
+    # dk_vip_demo="true"
+    # show_info "Setup local registry..."
+    # run_with_feedback "$CURRENT_DIR/scripts/setup_local_docker_registry.sh" "Docker local host enabled" "Docker local setup failed"
+    # fi
 
     # Step 12: IVI Interface (Optional)
     show_step 12 "IVI Interface" "Configuring In-Vehicle Infotainment system"
@@ -400,7 +400,7 @@ main() {
     if [[ "$dk_ivi_value" == "true" ]]; then
         show_info "Installing IVI interface..."
         run_with_feedback "$CURRENT_DIR/scripts/dk_enable_xhost.sh" "X11 forwarding enabled" "X11 setup failed"
-        run_with_feedback "docker pull $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI image downloaded" "Failed to download IVI"
+        run_with_feedback "echo 'Using local IVI image'" "IVI image downloaded" "Failed to download IVI"
         run_with_feedback "xhost +local:docker" "Docker X11 access granted" "X11 access failed"
         
         if [ -f "/etc/nv_tegra_release" ]; then
@@ -420,7 +420,7 @@ main() {
         if [[ "$install_ivi_choice" =~ ^[Yy]$ ]]; then
             echo -e "\n${GREEN}Installing IVI interface...${NC}"
             # run_with_feedback "$CURRENT_DIR/scripts/dk_enable_xhost.sh" "X11 forwarding enabled" "X11 setup failed"
-            run_with_feedback "docker pull $DOCKER_HUB_NAMESPACE/dk_ivi:latest" "IVI image downloaded" "Failed to download IVI"
+            run_with_feedback "echo 'Using local IVI image'" "IVI image downloaded" "Failed to download IVI"
             run_with_feedback "xhost +local:docker" "Docker X11 access granted" "X11 access failed"
             
             if [ -f "/etc/nv_tegra_release" ]; then

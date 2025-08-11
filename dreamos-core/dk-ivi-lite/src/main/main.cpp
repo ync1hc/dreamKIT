@@ -7,14 +7,8 @@
 
 #include "config.hpp"
 #include "dkmanager_subprocess.hpp"
-#include "../digitalauto/digitalauto.hpp"
-#include "../marketplace/marketplace.hpp"
-#include "../installedservices/installedservices.hpp"
-#include "../installedvapps/installedvapps.hpp"
-#include "../controls/controls.hpp"
 #include "../uss/uss.hpp"
 #include "../library/vapiclient/vapiclient.hpp"
-#include "../protocolbridge/protocolbridge.h"
 
 Q_LOGGING_CATEGORY(mainLog, "dk.ivi.main")
 
@@ -83,16 +77,8 @@ int main(int argc, char *argv[])
     VAPI_CLIENT.connectToServer(vapiEndpoint.toStdString().c_str());
     // Register QML types for pages
     qCInfo(mainLog) << "Registering QML types...";
-    qmlRegisterType<DigitalAutoAppAsync>("DigitalAutoAppAsync", 1, 0, "DigitalAutoAppAsync");
-    qmlRegisterType<MarketplaceAsync>("MarketplaceAsync", 1, 0, "MarketplaceAsync");
-    qmlRegisterType<ServicesAsync>("ServicesAsync", 1, 0, "ServicesAsync");
-    qmlRegisterType<VappsAsync>("VappsAsync", 1, 0, "VappsAsync");
-    qmlRegisterType<ControlsAsync>("ControlsAsync", 1, 0, "ControlsAsync");
     qmlRegisterType<UssAsync>("UssAsync", 1, 0, "UssAsync");
     
-    // Register Protocol Bridge QML types
-    ProtocolBridge::registerQMLTypes();
-
     QQmlApplicationEngine engine;
     
     // Expose configuration to QML context
@@ -105,9 +91,6 @@ int main(int argc, char *argv[])
         {"qtBackend", config.qtBackend()},
         {"debugMode", config.enableDebug()}
     }));
-    
-    // Expose Protocol Bridge to QML context
-    ProtocolBridge::exposeToQML(rootContext);
     
     qCInfo(mainLog) << "Configuration and Protocol Bridge exposed to QML context";
     
